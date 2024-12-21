@@ -10,6 +10,7 @@ restartPolicyType = "on_failure"
 
 [nixpacks]
 rust-version = "1.70.0"
+apt = ["libpq-dev", "postgresql-client"]
 
 [provision]
 postgresql = true
