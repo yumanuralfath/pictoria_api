@@ -1,6 +1,10 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cargo build --release"
+buildCommand = """
+apt-get update && \
+apt-get install -y libpq-dev postgresql-client pkg-config && \
+cargo build --release
+"""
 
 [deploy]
 startCommand = "./target/release/pictoria_api"
