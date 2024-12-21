@@ -10,7 +10,7 @@ ls -l /app/bin/
 """
 
 [deploy]
-startCommand = "/app/bin/pictoria_api"
+startCommand = ""ls -l /app/bin/ && /app/bin/pictoria_api""
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
