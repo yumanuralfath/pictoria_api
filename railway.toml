@@ -1,10 +1,15 @@
 [build]
-builder = "docker"
+builder = "nixpacks"
 
 [deploy]
+startCommand = "./pictoria_api"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
+
+[nixpacks]
+rust-version = "1.70.0"
+apt = ["libpq-dev", "postgresql-client"]
 
 [provision]
 postgresql = true
