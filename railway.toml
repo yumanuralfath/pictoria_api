@@ -10,8 +10,6 @@ cp target/release/pictoria_api /app/bin/
 
 [deploy]
 startCommand = "/app/bin/pictoria_api"
-healthcheckPath = "/"
-healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 
 [nixpacks]
