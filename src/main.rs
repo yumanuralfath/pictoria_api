@@ -1,13 +1,16 @@
 #[macro_use]
 extern crate rocket;
 
+mod controllers;
+mod models;
+mod routes;
+mod schema;
+mod services;
+mod utils;
+
+use crate::routes::get_routes;
 use dotenvy::dotenv;
 use std::env;
-
-#[get("/")]
-fn index() -> &'static str {
-    "Welcome to the world of Pictoria!"
-}
 
 #[launch]
 fn rocket() -> _ {
@@ -22,5 +25,6 @@ fn rocket() -> _ {
             .merge(("port", port))
             .merge(("address", address)),
     )
-    .mount("/", routes![index])
+    .mount("/", get_routes())
+    .attach(utils::db::attach_db())
 }
