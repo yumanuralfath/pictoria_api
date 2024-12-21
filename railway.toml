@@ -6,10 +6,7 @@ apt-get install -y libpq-dev postgresql-client pkg-config && \
 cargo build --release && \
 mkdir -p /app/bin && \
 cp target/release/pictoria_api /app/bin/ && \
-chmod +x /app/bin/pictoria_api && \
-ls -l /app/bin/ && \
-file /app/bin/pictoria_api && \
-ldd /app/bin/pictoria_api
+ls -l /app/bin/
 """
 
 [deploy]
