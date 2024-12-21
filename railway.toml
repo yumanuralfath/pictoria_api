@@ -8,3 +8,6 @@ healthcheckTimeout = 100
 
 [nixpacks]
 rust-version = "1.75.0"
+
+[nixpacks.setup]
+pkgs = ["postgresql"]

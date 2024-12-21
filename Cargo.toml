@@ -7,7 +7,7 @@ edition = "2021"
 rocket = { version = "0.5.0", features = ["json"] }
 dotenvy = "0.15"
 tokio = { version = "1.30.0", features = ["full"] }
-diesel = { version = "2.1.0", features = ["postgres", "r2d2", "chrono", "bundled"], default-features = false }
+diesel = { version = "2.1.0", features = ["postgres", "r2d2", "chrono"], default-features = false }
 serde = { version = "1.0.200", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = "0.6"
