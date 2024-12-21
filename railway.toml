@@ -10,7 +10,7 @@ cp target/release/pictoria_api /app/bin/
 
 [deploy]
 startCommand = "/app/bin/pictoria_api"
-healthcheckPath = "/"
+healthcheckPath = "/users"
 healthcheckTimeout = 200
 restartPolicyType = "on_failure"
 
