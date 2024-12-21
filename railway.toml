@@ -1,18 +1,21 @@
 [build]
 builder = "nixpacks"
+buildCommand = "cargo build --release"
 
 [deploy]
-startCommand = "./pictoria_api"
+startCommand = "./target/release/pictoria_api"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 
 [nixpacks]
 rust-version = "1.70.0"
-apt = ["libpq-dev", "postgresql-client"]
+apt = ["libpq-dev", "postgresql-client", "pkg-config"]
+pkgs = ["postgresql"]
 
 [provision]
 postgresql = true
 
 [variables]
 RUST_LOG = "info"
+PKG_CONFIG_PATH = "/usr/lib/x86_64-linux-gnu/pkgconfig"
