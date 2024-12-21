@@ -23,3 +23,4 @@ postgresql = true
 [variables]
 RUST_LOG = "info"
 PKG_CONFIG_PATH = "/usr/lib/x86_64-linux-gnu/pkgconfig"
+ADDRESS = "0.0.0.0"
