@@ -5,12 +5,11 @@ apt-get update && \
 apt-get install -y libpq-dev postgresql-client pkg-config && \
 cargo build --release && \
 mkdir -p /app/bin && \
-cp target/release/pictoria_api /app/bin/ && \
-ls -l /app/bin/
+cp target/release/pictoria_api /app/bin/
 """
 
 [deploy]
-startCommand = ""ls -l /app/bin/ && /app/bin/pictoria_api""
+startCommand = "ls -l /app/bin/ && /app/bin/pictoria_api"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
