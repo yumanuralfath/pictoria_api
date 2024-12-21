@@ -13,6 +13,7 @@ startCommand = "/app/bin/pictoria_api"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
+healthcheckInterval = 15
 
 [nixpacks]
 rust-version = "1.70.0"
@@ -25,3 +26,5 @@ postgresql = true
 [variables]
 RUST_LOG = "info"
 PKG_CONFIG_PATH = "/usr/lib/x86_64-linux-gnu/pkgconfig"
+ADDRESS = "0.0.0.0"
+PORT = "8000"
