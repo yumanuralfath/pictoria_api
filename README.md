@@ -20,8 +20,8 @@ Sebelum memulai, pastikan Anda telah menginstal:
 
 1. Clone repositori ini:
    ```bash
-   git clone https://github.com/username/pictwar-online.git
-   cd pictwar-online
+   git clone https://github.com/yumanuralfath/pictoria_api
+   cd pictoria_api
    ```
 
 2. Install dependensi:
@@ -31,7 +31,7 @@ Sebelum memulai, pastikan Anda telah menginstal:
 
 3. Buat file `.env` di root proyek dan tambahkan konfigurasi database Anda:
    ```env
-   DATABASE_URL=postgres://username:password@localhost/pictwar
+   DATABASE_URL=postgres://username:password@localhost/pictoria_api
    ```
 
 ## Menjalankan Aplikasi
