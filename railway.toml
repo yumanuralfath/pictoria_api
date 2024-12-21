@@ -10,6 +10,8 @@ cp target/release/pictoria_api /app/bin/
 
 [deploy]
 startCommand = "/app/bin/pictoria_api"
+healthcheckPath = "/"
+healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 
 [nixpacks]
@@ -23,4 +25,3 @@ postgresql = true
 [variables]
 RUST_LOG = "info"
 PKG_CONFIG_PATH = "/usr/lib/x86_64-linux-gnu/pkgconfig"
-ADDRESS = "0.0.0.0"
