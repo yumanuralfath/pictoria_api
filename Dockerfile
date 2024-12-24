@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=builder /usr/src/app/target/release/pictoria_api /usr/local/bin/pictoria_api
 
 # Menyalin file konfigurasi seperti .env dan diesel.toml
-COPY .env ./ 
+# COPY .env ./ 
 COPY diesel.toml ./ 
 
 # Mengekspos port yang digunakan aplikasi
