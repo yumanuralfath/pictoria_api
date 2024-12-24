@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rocket = { version = "0.5.0", features = ["json"] }
+rocket = { version = "0.5.0-rc.2", features = ["json"] }
 dotenvy = "0.15"
 tokio = { version = "1.30.0", features = ["full"] }
 diesel = { version = "2.1.0", features = ["postgres", "r2d2", "chrono"] }

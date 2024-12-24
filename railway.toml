@@ -13,7 +13,7 @@ healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 
 [nixpacks]
-rust-version = "1.70.0"
+rust-version = "1.83.0"
 apt = ["libpq-dev", "postgresql-client", "pkg-config"]
 pkgs = ["postgresql"]
 
