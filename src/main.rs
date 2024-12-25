@@ -3,6 +3,7 @@ extern crate rocket;
 
 mod controllers;
 mod models;
+mod output;
 mod routes;
 mod schema;
 mod services;

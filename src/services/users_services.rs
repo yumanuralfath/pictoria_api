@@ -17,9 +17,13 @@ impl<'a> UserService<'a> {
         self.pool.get().expect("Failed to get DB connection")
     }
 
-    pub(crate) fn get_users(&self) -> Vec<User> {
+    pub(crate) fn get_users(&self, offset: i64, limit: i64) -> Vec<User> {
         let mut conn = self.get_connection();
-        users.load::<User>(&mut conn).expect("Error loading users")
+        users
+            .limit(limit)
+            .offset(offset)
+            .load::<User>(&mut conn)
+            .expect("Error loading users")
     }
 
     pub(crate) fn get_user(&self, user_id: i32) -> Option<User> {
@@ -33,5 +37,10 @@ impl<'a> UserService<'a> {
             .values(new_user)
             .get_result(&mut conn)
             .expect("Error creating user")
+    }
+
+    pub fn count_users(&self) -> i64 {
+        let mut conn = self.get_connection();
+        users.count().get_result(&mut conn).unwrap_or(0)
     }
 }

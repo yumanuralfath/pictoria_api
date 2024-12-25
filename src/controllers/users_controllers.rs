@@ -13,8 +13,8 @@ impl<'a> UserController<'a> {
         }
     }
 
-    pub fn get_all_users(&self) -> Vec<User> {
-        self.user_service.get_users()
+    pub fn get_all_users(&self, offset: i64, limit: i64) -> Vec<User> {
+        self.user_service.get_users(offset, limit)
     }
 
     pub fn get_user_by_id(&self, user_id: i32) -> Option<User> {
@@ -23,5 +23,9 @@ impl<'a> UserController<'a> {
 
     pub fn create_new_user(&self, new_user: NewUser) -> User {
         self.user_service.create_user(new_user)
+    }
+
+    pub fn get_total_users(&self) -> i64 {
+        self.user_service.count_users()
     }
 }
