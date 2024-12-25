@@ -1,6 +1,9 @@
 use crate::controllers::users_controllers::UserController;
-use crate::models::users::{NewUser, User};
-use crate::output::user_output::{PaginatedUserResponse, PaginationInfo, UserOutput};
+use crate::models::users::{LoginCredentials, NewUser};
+use crate::output::user_output::{
+    CreateUserResponse, PaginatedUserResponse, PaginationInfo, UserOutput,
+};
+use crate::utils::auth::{generate_token, AuthenticatedUser};
 use crate::utils::db::DbPool;
 use crate::utils::pagination::paginate;
 use rocket::http::Status;
@@ -15,6 +18,7 @@ fn get_user_controller(pool: &State<DbPool>) -> UserController {
 
 #[get("/users?<page>&<limit>")]
 pub async fn get_users(
+    _auth: AuthenticatedUser,
     page: Option<u32>,
     limit: Option<u32>,
     pool: &State<DbPool>,
@@ -39,7 +43,11 @@ pub async fn get_users(
 }
 
 #[get("/user/<user_id>")]
-pub async fn get_user(user_id: i32, pool: &State<DbPool>) -> Result<Json<UserOutput>, Status> {
+pub async fn get_user(
+    user_id: i32,
+    pool: &State<DbPool>,
+    _auth: AuthenticatedUser,
+) -> Result<Json<UserOutput>, Status> {
     let user_controller = get_user_controller(pool);
     match user_controller.get_user_by_id(user_id) {
         Some(user) => {
@@ -50,11 +58,11 @@ pub async fn get_user(user_id: i32, pool: &State<DbPool>) -> Result<Json<UserOut
     }
 }
 
-#[post("/users", data = "<user>")]
+#[post("/register", data = "<user>")]
 pub async fn create_user(
     user: Json<NewUser>,
     pool: &State<DbPool>,
-) -> Result<Json<User>, (Status, Json<Value>)> {
+) -> Result<Json<CreateUserResponse>, (Status, Json<Value>)> {
     let user_controller = get_user_controller(pool);
 
     if user.username.is_empty() || user.email.is_empty() || user.password.is_empty() {
@@ -64,6 +72,33 @@ pub async fn create_user(
         ));
     }
 
-    let new_user = user_controller.create_new_user(user.into_inner());
-    Ok(Json(new_user))
+    let result = user_controller.create_new_user(user.into_inner());
+    let response = CreateUserResponse::from_create_user(result);
+    Ok(Json(response))
+}
+
+#[post("/login", data = "<credentials>")]
+pub async fn login_route(
+    credentials: Json<LoginCredentials>,
+    pool: &State<DbPool>,
+) -> Result<Json<Value>, (Status, Json<Value>)> {
+    let user_controller = get_user_controller(pool);
+
+    match user_controller.login_controller(credentials.into_inner()) {
+        Some(user) => {
+            let token = generate_token(user.id);
+            Ok(Json(json!({
+                "token": token,
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "username": user.username
+                }
+            })))
+        }
+        None => Err((
+            Status::Unauthorized,
+            Json(json!({"error": "Invalid credentials"})),
+        )),
+    }
 }

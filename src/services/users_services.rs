@@ -1,5 +1,6 @@
-use crate::models::users::{NewUser, User};
+use crate::models::users::{LoginCredentials, NewUser, User};
 use crate::schema::users::dsl::*;
+use crate::utils::auth::{hash_password, verify_password};
 use crate::utils::db::DbPool;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
@@ -31,12 +32,28 @@ impl<'a> UserService<'a> {
         users.find(user_id).first(&mut conn).ok()
     }
 
-    pub(crate) fn create_user(&self, new_user: NewUser) -> User {
+    pub fn create_user(&self, mut new_user: NewUser) -> User {
         let mut conn = self.get_connection();
+        new_user.password = hash_password(&new_user.password);
+
         diesel::insert_into(users)
             .values(new_user)
             .get_result(&mut conn)
             .expect("Error creating user")
+    }
+
+    pub fn login_user(&self, credentials: LoginCredentials) -> Option<User> {
+        let mut conn = self.get_connection();
+        let user = users
+            .filter(email.eq(credentials.email))
+            .first::<User>(&mut conn)
+            .ok()?;
+
+        if verify_password(&credentials.password, &user.password) {
+            Some(user)
+        } else {
+            None
+        }
     }
 
     pub fn count_users(&self) -> i64 {

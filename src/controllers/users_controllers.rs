@@ -1,4 +1,4 @@
-use crate::models::users::{NewUser, User};
+use crate::models::users::{LoginCredentials, NewUser, User};
 use crate::services::users_services::UserService;
 use crate::utils::db::DbPool;
 
@@ -23,6 +23,10 @@ impl<'a> UserController<'a> {
 
     pub fn create_new_user(&self, new_user: NewUser) -> User {
         self.user_service.create_user(new_user)
+    }
+
+    pub fn login_controller(&self, credentials: LoginCredentials) -> Option<User> {
+        self.user_service.login_user(credentials)
     }
 
     pub fn get_total_users(&self) -> i64 {

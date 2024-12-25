@@ -10,7 +10,7 @@ pub struct User {
     pub id: i32,
     pub username: String,
     pub email: String,
-    pub password: String, 
+    pub password: String,
     pub is_admin: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -24,5 +24,11 @@ pub struct NewUser {
     #[serde(default)]
     pub email: String,
     #[serde(default)]
+    pub password: String,
+}
+
+#[derive(Deserialize)]
+pub struct LoginCredentials {
+    pub email: String,
     pub password: String,
 }
