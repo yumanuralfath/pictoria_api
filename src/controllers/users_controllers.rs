@@ -1,5 +1,5 @@
 use crate::models::users::{NewUser, User};
-use crate::services::user_service::UserService;
+use crate::services::users_services::UserService;
 use crate::utils::db::DbPool;
 
 pub struct UserController<'a> {
@@ -17,7 +17,7 @@ impl<'a> UserController<'a> {
         self.user_service.get_users()
     }
 
-    pub fn get_user_by_id(&self, user_id: i32) -> User {
+    pub fn get_user_by_id(&self, user_id: i32) -> Option<User> {
         self.user_service.get_user(user_id)
     }
 
