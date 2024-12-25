@@ -26,6 +26,7 @@ WORKDIR /app
 COPY --from=builder /usr/src/app/target/release/pictoria_api /usr/local/bin/pictoria_api
 
 # Menyalin file konfigurasi seperti .env dan diesel.toml
+# TODO: Tambahkan .env ke dalam container, uncomment jika perlu
 # COPY .env ./ 
 COPY diesel.toml ./ 
 
