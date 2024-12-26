@@ -9,6 +9,7 @@ pub struct UserOutput {
     pub is_admin: bool,
     pub created_at: String,
     pub updated_at: String,
+    pub profile_picture_url: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -47,6 +48,7 @@ impl UserOutput {
             is_admin: user.is_admin,
             created_at: user.created_at.to_string(),
             updated_at: user.updated_at.to_string(),
+            profile_picture_url: user.profile_picture_url,
         }
     }
 }

@@ -9,5 +9,6 @@ diesel::table! {
         is_admin -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        profile_picture_url -> Nullable<Varchar>,
     }
 }

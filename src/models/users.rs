@@ -13,11 +13,12 @@ pub struct User {
     pub email: String,
     pub password: String,
     pub is_admin: bool,
+    pub profile_picture_url: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(Insertable, Serialize, Deserialize, Debug)]
+#[derive(Insertable, Serialize, Deserialize, Debug, Selectable)]
 #[diesel(table_name = users)]
 pub struct NewUser {
     #[serde(default)]
@@ -26,6 +27,7 @@ pub struct NewUser {
     pub email: String,
     #[serde(default)]
     pub password: String,
+    pub profile_picture_url: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -49,4 +51,5 @@ pub struct UpdatedUser {
     pub username: Option<String>,
     pub email: Option<String>,
     pub password: Option<String>,
+    pub profile_picture_url: Option<String>,
 }

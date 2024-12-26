@@ -41,6 +41,7 @@ impl<'a> UserService<'a> {
         users
             .limit(limit)
             .offset(offset)
+            .select(User::as_select())
             .load::<User>(&mut conn)
             .expect("Error loading users")
     }
@@ -49,6 +50,7 @@ impl<'a> UserService<'a> {
         let mut conn = self.get_connection();
         users
             .find(user_id)
+            .select(User::as_select())
             .first::<User>(&mut conn)
             .ok()
             .map(UserOutput::from_user)
@@ -62,9 +64,13 @@ impl<'a> UserService<'a> {
 
         let mut conn = self.get_connection();
         new_user.password = hash_password(&new_user.password);
+        if new_user.profile_picture_url.is_none() {
+            new_user.profile_picture_url = Some("https://picsum.photos/980/980".to_string());
+        }
 
         diesel::insert_into(users)
             .values(new_user)
+            .returning(User::as_returning())
             .get_result(&mut conn)
             .map_err(|e| format!("Error creating user: {}", e))
     }
@@ -83,6 +89,7 @@ impl<'a> UserService<'a> {
         let mut conn = self.get_connection();
         let user = users
             .filter(email.eq(credentials.email))
+            .select(User::as_select())
             .first::<User>(&mut conn)
             .ok()?;
 
@@ -102,7 +109,8 @@ impl<'a> UserService<'a> {
 
         diesel::update(users.find(user_id))
             .set(user)
-            .get_result::<User>(&mut conn)
+            .returning(User::as_returning())
+            .get_result(&mut conn)
             .expect("Error editing user")
     }
 
@@ -115,6 +123,7 @@ impl<'a> UserService<'a> {
 
         diesel::update(users.find(user_id))
             .set(user)
+            .returning(User::as_returning())
             .get_result(&mut conn)
             .expect("Error updating user")
     }
