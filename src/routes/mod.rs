@@ -8,5 +8,8 @@ pub fn get_routes() -> Vec<rocket::Route> {
         users_routes::get_user,
         users_routes::create_user,
         users_routes::login_route,
+        users_routes::edit_user,
+        users_routes::update_user,
+        users_routes::me
     ]
 }

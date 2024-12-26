@@ -32,6 +32,12 @@ pub struct CreateUserResponse {
     pub message: String,
 }
 
+#[derive(Serialize)]
+pub struct LoginResponse {
+    pub token: String,
+    pub user: UserOutput,
+}
+
 impl UserOutput {
     pub fn from_user(user: User) -> Self {
         UserOutput {

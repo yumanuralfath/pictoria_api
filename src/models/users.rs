@@ -1,6 +1,7 @@
 use crate::schema::users;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
+use diesel::AsChangeset;
 use diesel::Insertable;
 use serde::{Deserialize, Serialize};
 
@@ -31,4 +32,21 @@ pub struct NewUser {
 pub struct LoginCredentials {
     pub email: String,
     pub password: String,
+}
+
+#[derive(AsChangeset, Serialize, Deserialize, Debug)]
+#[diesel(table_name = users)]
+pub struct EditUser {
+    pub username: Option<String>,
+    pub email: Option<String>,
+    pub password: Option<String>,
+    pub is_admin: Option<bool>,
+}
+
+#[derive(Deserialize, AsChangeset, Debug, Serialize)]
+#[diesel(table_name = users)]
+pub struct UpdatedUser {
+    pub username: Option<String>,
+    pub email: Option<String>,
+    pub password: Option<String>,
 }

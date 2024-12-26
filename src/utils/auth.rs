@@ -12,7 +12,6 @@ pub struct Claims {
     pub exp: usize,
 }
 
-#[allow(dead_code)]
 pub struct AuthenticatedUser {
     pub user_id: i32,
 }
