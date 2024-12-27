@@ -1,4 +1,4 @@
-use crate::models::users::{EditUser, LoginCredentials, NewUser, User, UpdatedUser};
+use crate::models::users::{EditUser, LoginCredentials, NewUser, UpdatedUser, User};
 use crate::output::user_output::{LoginResponse, PaginatedUserResponse, UserOutput};
 use crate::services::users_services::UserService;
 use crate::utils::db::DbPool;
@@ -30,11 +30,11 @@ impl<'a> UserController<'a> {
         self.service.login(credentials)
     }
 
-    pub fn edit_user(&self, user_id: i32, user: EditUser) -> User {
+    pub fn edit_user(&self, user_id: i32, user: EditUser) -> Result<User, String> {
         self.service.edit_user(user_id, user)
     }
 
-    pub fn update_user(&self, user_id: i32, user: UpdatedUser) -> User {
+    pub fn update_user(&self, user_id: i32, user: UpdatedUser) -> Result<User, String> {
         self.service.update_user(user_id, user)
     }
 }

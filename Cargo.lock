@@ -1243,6 +1243,7 @@ dependencies = [
  "diesel",
  "dotenvy",
  "jsonwebtoken",
+ "regex",
  "rocket",
  "rocket_cors",
  "serde",

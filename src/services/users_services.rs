@@ -7,6 +7,7 @@ use crate::utils::auth::{generate_token, hash_password, verify_password};
 use crate::utils::db::DbPool;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
+use regex::Regex;
 
 pub struct UserService<'a> {
     pool: &'a DbPool,
@@ -19,6 +20,25 @@ impl<'a> UserService<'a> {
 
     fn get_connection(&self) -> PooledConnection<ConnectionManager<PgConnection>> {
         self.pool.get().expect("Failed to get DB connection")
+    }
+
+    fn is_valid_email(new_email: &str) -> Result<(), String> {
+        let regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
+        if regex.is_match(new_email) {
+            Ok(())
+        } else {
+            Err("Invalid email format".to_string())
+        }
+    }
+
+    fn get_users(&self, offset: i64, limit: i64) -> Vec<User> {
+        let mut conn = self.get_connection();
+        users
+            .limit(limit)
+            .offset(offset)
+            .select(User::as_select())
+            .load::<User>(&mut conn)
+            .expect("Error loading users")
     }
 
     pub fn get_paginated_users(&self, offset: i64, limit: i64, page: u32) -> PaginatedUserResponse {
@@ -34,16 +54,6 @@ impl<'a> UserService<'a> {
                 total_items: self.count_users(),
             },
         }
-    }
-
-    fn get_users(&self, offset: i64, limit: i64) -> Vec<User> {
-        let mut conn = self.get_connection();
-        users
-            .limit(limit)
-            .offset(offset)
-            .select(User::as_select())
-            .load::<User>(&mut conn)
-            .expect("Error loading users")
     }
 
     pub fn get_user(&self, user_id: i32) -> Option<UserOutput> {
@@ -62,8 +72,11 @@ impl<'a> UserService<'a> {
             return Err("Username, email, and password are required.".to_string());
         }
 
+        Self::is_valid_email(&new_user.email)?;
+
         let mut conn = self.get_connection();
         new_user.password = hash_password(&new_user.password);
+
         if new_user.profile_picture_url.is_none() {
             new_user.profile_picture_url = Some("https://picsum.photos/980/980".to_string());
         }
@@ -100,32 +113,40 @@ impl<'a> UserService<'a> {
         }
     }
 
-    pub fn edit_user(&self, user_id: i32, mut user: EditUser) -> User {
+    pub fn edit_user(&self, user_id: i32, mut user: EditUser) -> Result<User, String> {
         let mut conn = self.get_connection();
 
         if let Some(ref new_password) = user.password {
             user.password = Some(hash_password(new_password));
         }
 
+        if let Some(ref new_email) = user.email {
+            Self::is_valid_email(new_email)?;
+        }
+
         diesel::update(users.find(user_id))
             .set(user)
             .returning(User::as_returning())
             .get_result(&mut conn)
-            .expect("Error editing user")
+            .map_err(|e| format!("Error editing user: {}", e))
     }
 
-    pub fn update_user(&self, user_id: i32, mut user: UpdatedUser) -> User {
+    pub fn update_user(&self, user_id: i32, mut user: UpdatedUser) -> Result<User, String> {
         let mut conn = self.get_connection();
 
         if let Some(ref new_password) = user.password {
             user.password = Some(hash_password(new_password));
         }
 
+        if let Some(ref new_email) = user.email {
+            Self::is_valid_email(new_email)?;
+        }
+
         diesel::update(users.find(user_id))
             .set(user)
             .returning(User::as_returning())
             .get_result(&mut conn)
-            .expect("Error updating user")
+            .map_err(|e| format!("Error updating user: {}", e))
     }
 
     pub fn count_users(&self) -> i64 {

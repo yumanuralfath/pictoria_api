@@ -76,13 +76,20 @@ pub async fn edit_user(
     user: Json<EditUser>,
     pool: &State<DbPool>,
     _auth: AuthenticatedUser,
-) -> Result<Json<Value>, Status> {
+) -> Result<Json<Value>, (Status, Json<Value>)> {
     let user_controller = UserController::new(pool.inner());
-    let updated_user = user_controller.edit_user(user_id, user.into_inner());
-    Ok(Json(json!({
-        "message": "User edited successfully",
-        "user": updated_user
-    })))
+    match user_controller.edit_user(user_id, user.into_inner()) {
+        Ok(updated_user) => Ok(Json(json!({
+            "message": "User edited successfully",
+            "user": updated_user
+        }))),
+        Err(e) => Err((
+            Status::BadRequest,
+            Json(json!({
+                "error": e
+            })),
+        )),
+    }
 }
 
 #[put("/user", data = "<user>")]
@@ -90,13 +97,20 @@ pub async fn update_user(
     auth: AuthenticatedUser,
     user: Json<UpdatedUser>,
     pool: &State<DbPool>,
-) -> Result<Json<Value>, Status> {
+) -> Result<Json<Value>, (Status, Json<Value>)> {
     let user_controller = UserController::new(pool.inner());
-    let updated_user = user_controller.update_user(auth.user_id, user.into_inner());
-    Ok(Json(json!({
-        "message": "User Update successfully",
-        "user": updated_user
-    })))
+    match user_controller.update_user(auth.user_id, user.into_inner()) {
+        Ok(updated_user) => Ok(Json(json!({
+            "message": "User Update successfully",
+            "user": updated_user
+        }))),
+        Err(e) => Err((
+            Status::BadRequest,
+            Json(json!({
+                "error": e
+            })),
+        )),
+    }
 }
 
 #[get("/me")]
