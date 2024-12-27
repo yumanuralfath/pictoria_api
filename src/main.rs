@@ -25,7 +25,7 @@ fn rocket() -> _ {
     let allowed_origins =
         AllowedOrigins::some_exact(&["http://localhost:3000", "https://www.yumana.my.id"]);
 
-    //for development only, comment this line for production
+    // for development only, comment this line for production
     // let allowed_origins = AllowedOrigins::all();
 
     let cors = rocket_cors::CorsOptions {

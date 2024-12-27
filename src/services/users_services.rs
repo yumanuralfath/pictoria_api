@@ -3,6 +3,7 @@ use crate::output::user_output::{
     LoginResponse, PaginatedUserResponse, PaginationInfo, UserOutput,
 };
 use crate::schema::users::dsl::*;
+use crate::utils::auth::AuthenticatedUser;
 use crate::utils::auth::{generate_token, hash_password, verify_password};
 use crate::utils::db::DbPool;
 use diesel::prelude::*;
@@ -41,7 +42,24 @@ impl<'a> UserService<'a> {
             .expect("Error loading users")
     }
 
-    pub fn get_paginated_users(&self, offset: i64, limit: i64, page: u32) -> PaginatedUserResponse {
+    pub fn get_paginated_users(
+        &self,
+        offset: i64,
+        limit: i64,
+        page: u32,
+        auth_user: &AuthenticatedUser,
+    ) -> PaginatedUserResponse {
+        if !auth_user.is_admin {
+            return PaginatedUserResponse {
+                users: vec![],
+                pagination: PaginationInfo {
+                    current_page: page,
+                    limit: limit as u32,
+                    total_items: 0,
+                },
+            };
+        }
+
         let users_list = self.get_users(offset, limit);
         let modified_results: Vec<UserOutput> =
             users_list.into_iter().map(UserOutput::from_user).collect();
@@ -56,7 +74,11 @@ impl<'a> UserService<'a> {
         }
     }
 
-    pub fn get_user(&self, user_id: i32) -> Option<UserOutput> {
+    pub fn get_user(&self, user_id: i32, auth_user: &AuthenticatedUser) -> Option<UserOutput> {
+        if !auth_user.is_admin {
+            return None;
+        }
+
         let mut conn = self.get_connection();
         users
             .find(user_id)
@@ -90,7 +112,7 @@ impl<'a> UserService<'a> {
 
     pub fn login(&self, credentials: LoginCredentials) -> Option<LoginResponse> {
         let user = self.authenticate_user(credentials)?;
-        let token = generate_token(user.id);
+        let token = generate_token(user.id, user.is_admin);
 
         Some(LoginResponse {
             token,
@@ -113,7 +135,16 @@ impl<'a> UserService<'a> {
         }
     }
 
-    pub fn edit_user(&self, user_id: i32, mut user: EditUser) -> Result<User, String> {
+    pub fn edit_user(
+        &self,
+        user_id: i32,
+        mut user: EditUser,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<User, String> {
+        if !auth_user.is_admin {
+            return Err("Unauthorized: Only admins can edit users.".to_string());
+        }
+
         let mut conn = self.get_connection();
 
         if let Some(ref new_password) = user.password {

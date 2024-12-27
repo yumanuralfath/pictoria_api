@@ -10,10 +10,12 @@ use std::env;
 pub struct Claims {
     pub sub: i32,
     pub exp: usize,
+    pub is_admin: bool,
 }
 
 pub struct AuthenticatedUser {
     pub user_id: i32,
+    pub is_admin: bool,
 }
 
 #[rocket::async_trait]
@@ -33,6 +35,7 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
                 match decode::<Claims>(&token, &decoding_key, &validation) {
                     Ok(token_data) => Outcome::Success(AuthenticatedUser {
                         user_id: token_data.claims.sub,
+                        is_admin: token_data.claims.is_admin,
                     }),
                     Err(_) => Outcome::Error((Status::Unauthorized, ())),
                 }
@@ -50,7 +53,7 @@ pub fn verify_password(password: &str, hash: &str) -> bool {
     verify(password.as_bytes(), hash).unwrap_or(false)
 }
 
-pub fn generate_token(user_id: i32) -> String {
+pub fn generate_token(user_id: i32, is_admin: bool) -> String {
     let expiration = chrono::Utc::now()
         .checked_add_signed(chrono::Duration::hours(24))
         .unwrap()
@@ -59,6 +62,7 @@ pub fn generate_token(user_id: i32) -> String {
     let claims = Claims {
         sub: user_id,
         exp: expiration,
+        is_admin,
     };
 
     let secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");

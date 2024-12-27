@@ -22,7 +22,7 @@ pub async fn get_users(
     let controller = UserController::new(pool.inner());
     let (offset, limit_val) = paginate(page, limit);
 
-    Json(controller.get_users(offset, limit_val, page.unwrap_or(1)))
+    Json(controller.get_users(offset, limit_val, page.unwrap_or(1), &_auth))
 }
 
 #[get("/user/<user_id>")]
@@ -32,7 +32,7 @@ pub async fn get_user(
     _auth: AuthenticatedUser,
 ) -> Result<Json<UserOutput>, Status> {
     let user_controller = UserController::new(pool.inner());
-    match user_controller.get_user_by_id(user_id) {
+    match user_controller.get_user_by_id(user_id, &_auth) {
         Some(output) => Ok(Json(output)),
         None => Err(Status::NotFound),
     }
@@ -78,7 +78,7 @@ pub async fn edit_user(
     _auth: AuthenticatedUser,
 ) -> Result<Json<Value>, (Status, Json<Value>)> {
     let user_controller = UserController::new(pool.inner());
-    match user_controller.edit_user(user_id, user.into_inner()) {
+    match user_controller.edit_user(user_id, user.into_inner(), &_auth) {
         Ok(updated_user) => Ok(Json(json!({
             "message": "User edited successfully",
             "user": updated_user
@@ -116,7 +116,7 @@ pub async fn update_user(
 #[get("/me")]
 pub async fn me(auth: AuthenticatedUser, pool: &State<DbPool>) -> Result<Json<Value>, Status> {
     let user_controller = UserController::new(pool.inner());
-    let user = user_controller.get_user_by_id(auth.user_id);
+    let user = user_controller.get_user_by_id(auth.user_id, &auth);
     Ok(Json(json!({
         "user": user
     })))
