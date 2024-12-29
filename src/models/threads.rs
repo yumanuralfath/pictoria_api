@@ -4,7 +4,7 @@ use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-#[derive(Queryable, Serialize, Deserialize, Selectable)]
+#[derive(Queryable, Serialize, Deserialize, Selectable, Debug)]
 #[diesel(table_name = threads)]
 pub struct Thread {
     pub id: i32,

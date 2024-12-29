@@ -18,11 +18,14 @@ pub async fn get_users(
     page: Option<u32>,
     limit: Option<u32>,
     pool: &State<DbPool>,
-) -> Json<PaginatedUserResponse> {
+) -> Result<Json<PaginatedUserResponse>, (Status, Json<Value>)> {
     let controller = UserController::new(pool.inner());
     let (offset, limit_val) = paginate(page, limit);
 
-    Json(controller.get_users(offset, limit_val, page.unwrap_or(1), &_auth))
+    match controller.get_users(offset, limit_val, page.unwrap_or(1), &_auth) {
+        Ok(response) => Ok(Json(response)),
+        Err(err) => Err((Status::Unauthorized, Json(json!({"error": err})))),
+    }
 }
 
 #[get("/user/<user_id>")]

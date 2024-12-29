@@ -21,7 +21,7 @@ impl<'a> UserController<'a> {
         limit: i64,
         page: u32,
         auth_user: &AuthenticatedUser,
-    ) -> PaginatedUserResponse {
+    ) -> Result<PaginatedUserResponse, String> {
         self.service
             .get_paginated_users(offset, limit, page, auth_user)
     }

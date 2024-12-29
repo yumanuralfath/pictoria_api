@@ -47,37 +47,26 @@ impl<'a> UserService<'a> {
         limit: i64,
         page: u32,
         auth_user: &AuthenticatedUser,
-    ) -> PaginatedUserResponse {
+    ) -> Result<PaginatedUserResponse, String> {
         if !auth_user.is_admin {
-            return PaginatedUserResponse {
-                users: vec![],
-                pagination: PaginationInfo {
-                    current_page: page,
-                    limit: limit as u32,
-                    total_items: 0,
-                },
-            };
+            return Err("Unauthorized: Only admins can access this resource.".to_string());
         }
 
         let users_list = self.get_users(offset, limit);
         let modified_results: Vec<UserOutput> =
             users_list.into_iter().map(UserOutput::from_user).collect();
 
-        PaginatedUserResponse {
+        Ok(PaginatedUserResponse {
             users: modified_results,
             pagination: PaginationInfo {
                 current_page: page,
                 limit: limit as u32,
                 total_items: self.count_users(),
             },
-        }
+        })
     }
 
-    pub fn get_user(&self, user_id: i32, auth_user: &AuthenticatedUser) -> Option<UserOutput> {
-        if !auth_user.is_admin {
-            return None;
-        }
-
+    pub fn get_user(&self, user_id: i32, _auth_user: &AuthenticatedUser) -> Option<UserOutput> {
         let mut conn = self.get_connection();
         users
             .find(user_id)
