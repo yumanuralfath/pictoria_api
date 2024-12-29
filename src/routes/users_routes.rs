@@ -116,6 +116,26 @@ pub async fn update_user(
     }
 }
 
+#[delete("/user/<user_id>")]
+pub async fn delete_user(
+    user_id: i32,
+    pool: &State<DbPool>,
+    _auth: AuthenticatedUser,
+) -> Result<Json<Value>, (Status, Json<Value>)> {
+    let user_controller = UserController::new(pool.inner());
+    match user_controller.delete_user(user_id, &_auth) {
+        Ok(_) => Ok(Json(json!({
+            "message": "User deleted successfully",
+        }))),
+        Err(e) => Err((
+            Status::BadRequest,
+            Json(json!({
+                "error": e
+            })),
+        )),
+    }
+}
+
 #[get("/me")]
 pub async fn me(auth: AuthenticatedUser, pool: &State<DbPool>) -> Result<Json<Value>, Status> {
     let user_controller = UserController::new(pool.inner());

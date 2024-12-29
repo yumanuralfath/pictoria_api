@@ -168,6 +168,18 @@ impl<'a> UserService<'a> {
             .map_err(|e| format!("Error updating user: {}", e))
     }
 
+    pub fn delete_user(&self, user_id: i32, auth_user: &AuthenticatedUser) -> Result<(), String> {
+        if !auth_user.is_admin {
+            return Err("Unauthorized: Only admins can delete users.".to_string());
+        }
+
+        let mut conn = self.get_connection();
+        diesel::delete(users.find(user_id))
+            .execute(&mut conn)
+            .map_err(|e| format!("Error deleting user: {}", e))
+            .map(|_| ())
+    }
+
     pub fn count_users(&self) -> i64 {
         let mut conn = self.get_connection();
         users.count().get_result(&mut conn).unwrap_or(0)

@@ -51,6 +51,10 @@ impl<'a> UserController<'a> {
         self.service.edit_user(user_id, user, auth_user)
     }
 
+    pub fn delete_user(&self, user_id: i32, auth_user: &AuthenticatedUser) -> Result<(), String> {
+        self.service.delete_user(user_id, auth_user)
+    }
+
     pub fn update_user(&self, user_id: i32, user: UpdatedUser) -> Result<User, String> {
         self.service.update_user(user_id, user)
     }
