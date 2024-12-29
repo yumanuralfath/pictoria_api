@@ -1,7 +1,6 @@
 use crate::models::users::{EditUser, LoginCredentials, NewUser, UpdatedUser, User};
-use crate::output::user_output::{
-    LoginResponse, PaginatedUserResponse, PaginationInfo, UserOutput,
-};
+use crate::output::pagination_output::PaginationInfo;
+use crate::output::user_output::{LoginResponse, PaginatedUserResponse, UserOutput};
 use crate::schema::users::dsl::*;
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::auth::{generate_token, hash_password, verify_password};

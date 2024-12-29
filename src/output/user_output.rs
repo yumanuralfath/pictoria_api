@@ -1,4 +1,5 @@
 use crate::models::users::User;
+use crate::output::pagination_output::PaginationInfo;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -7,8 +8,6 @@ pub struct UserOutput {
     pub username: String,
     pub email: String,
     pub is_admin: bool,
-    pub created_at: String,
-    pub updated_at: String,
     pub profile_picture_url: Option<String>,
 }
 
@@ -16,13 +15,6 @@ pub struct UserOutput {
 pub struct PaginatedUserResponse {
     pub users: Vec<UserOutput>,
     pub pagination: PaginationInfo,
-}
-
-#[derive(Serialize)]
-pub struct PaginationInfo {
-    pub current_page: u32,
-    pub limit: u32,
-    pub total_items: i64,
 }
 
 #[derive(Serialize)]
@@ -46,8 +38,6 @@ impl UserOutput {
             username: user.username,
             email: user.email,
             is_admin: user.is_admin,
-            created_at: user.created_at.to_string(),
-            updated_at: user.updated_at.to_string(),
             profile_picture_url: user.profile_picture_url,
         }
     }

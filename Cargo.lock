@@ -1234,24 +1234,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pictoria_api"
-version = "0.1.0"
-dependencies = [
- "bcrypt",
- "chrono",
- "chrono-tz",
- "diesel",
- "dotenvy",
- "jsonwebtoken",
- "regex",
- "rocket",
- "rocket_cors",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
 name = "pin-project-lite"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2408,6 +2390,24 @@ dependencies = [
  "quote",
  "syn",
  "synstructure",
+]
+
+[[package]]
+name = "yumana_api"
+version = "0.1.0"
+dependencies = [
+ "bcrypt",
+ "chrono",
+ "chrono-tz",
+ "diesel",
+ "dotenvy",
+ "jsonwebtoken",
+ "regex",
+ "rocket",
+ "rocket_cors",
+ "serde",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
