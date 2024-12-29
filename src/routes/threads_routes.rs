@@ -71,3 +71,23 @@ pub async fn update_thread(
         )),
     }
 }
+
+#[delete("/thread/<id>")]
+pub async fn delete_thread(
+    id: i32,
+    auth: AuthenticatedUser,
+    pool: &State<DbPool>,
+) -> Result<Json<Value>, (Status, Json<Value>)> {
+    let thread_controller = ThreadController::new(pool.inner());
+    match thread_controller.delete_thread(id, &auth) {
+        Ok(_) => Ok(Json(json!({
+            "message": "thread deleted successfully",
+        }))),
+        Err(e) => Err((
+            Status::BadRequest,
+            Json(json!({
+                "error": e
+            })),
+        )),
+    }
+}

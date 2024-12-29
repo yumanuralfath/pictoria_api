@@ -131,4 +131,25 @@ impl<'a> ThreadService<'a> {
             .get_result(&mut conn)
             .map_err(|e| format!("Error updating thread: {}", e))
     }
+
+    pub fn delete_thread(
+        &self,
+        thread_id: i32,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<(), String> {
+        let mut conn = self.get_connection();
+
+        let thread = self
+            .get_thread_by_id(thread_id)
+            .ok_or_else(|| "Thread not found".to_string())?;
+
+        if thread.user_id != auth_user.user_id {
+            return Err("Unauthorized to delete this thread".to_string());
+        }
+
+        diesel::delete(threads.find(thread_id))
+            .execute(&mut conn)
+            .map_err(|e| format!("Error deleting thread: {}", e))
+            .map(|_| ())
+    }
 }

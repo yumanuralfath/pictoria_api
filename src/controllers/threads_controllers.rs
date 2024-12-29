@@ -42,4 +42,12 @@ impl<'a> ThreadController<'a> {
     ) -> Result<Thread, String> {
         self.service.update_thread(thread_id, thread, auth_user)
     }
+
+    pub fn delete_thread(
+        &self,
+        thread_id: i32,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<(), String> {
+        self.service.delete_thread(thread_id, auth_user)
+    }
 }

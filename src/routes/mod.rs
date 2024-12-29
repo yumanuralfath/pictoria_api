@@ -15,6 +15,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         users_routes::delete_user,
         threads_routes::get_threads,
         threads_routes::create_thread,
-        threads_routes::update_thread
+        threads_routes::update_thread,
+        threads_routes::delete_thread
     ]
 }
