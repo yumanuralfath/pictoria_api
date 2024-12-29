@@ -1,5 +1,5 @@
 use crate::controllers::threads_controllers::ThreadController;
-use crate::models::threads::NewThread;
+use crate::models::threads::{NewThread, UpdateThread};
 use crate::output::thread_output::{CreateThreadResponse, PaginatedThreadResponse};
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
@@ -47,5 +47,27 @@ pub async fn create_thread(
             Ok(Json(response))
         }
         Err(e) => Err((Status::BadRequest, Json(json!({"error": e})))),
+    }
+}
+
+#[put("/thread/<id>", data = "<thread>")]
+pub async fn update_thread(
+    id: i32,
+    auth: AuthenticatedUser,
+    thread: Json<UpdateThread>,
+    pool: &State<DbPool>,
+) -> Result<Json<Value>, (Status, Json<Value>)> {
+    let thread_controller = ThreadController::new(pool.inner());
+    match thread_controller.edit_thread(id, thread.into_inner(), &auth) {
+        Ok(updated_thread) => Ok(Json(json!({
+            "message": "thread Update successfully",
+            "thread": updated_thread
+        }))),
+        Err(e) => Err((
+            Status::BadRequest,
+            Json(json!({
+                "error": e
+            })),
+        )),
     }
 }

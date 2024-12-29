@@ -1,4 +1,4 @@
-use crate::models::threads::{NewThread, Thread};
+use crate::models::threads::{NewThread, Thread, UpdateThread};
 use crate::output::thread_output::PaginatedThreadResponse;
 use crate::services::threads_services::ThreadService;
 use crate::utils::auth::AuthenticatedUser;
@@ -32,5 +32,14 @@ impl<'a> ThreadController<'a> {
     ) -> PaginatedThreadResponse {
         self.service
             .get_paginated_threads(limit, offset, page, auth_user)
+    }
+
+    pub fn edit_thread(
+        &self,
+        thread_id: i32,
+        thread: UpdateThread,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<Thread, String> {
+        self.service.update_thread(thread_id, thread, auth_user)
     }
 }

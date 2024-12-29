@@ -1,4 +1,4 @@
-use crate::models::threads::{NewThread, Thread};
+use crate::models::threads::{NewThread, Thread, UpdateThread};
 use crate::output::pagination_output::PaginationInfo;
 use crate::output::thread_output::{PaginatedThreadResponse, ThreadOutput};
 use crate::schema::threads::dsl::*;
@@ -100,35 +100,35 @@ impl<'a> ThreadService<'a> {
         }
     }
 
-    // fn get_thread_by_id(&self, thread_id: i32) -> Option<Thread> {
-    //     let mut conn = self.get_connection();
-    //     threads
-    //         .find(thread_id)
-    //         .select(Thread::as_select())
-    //         .first(&mut conn)
-    //         .ok()
-    // }
+    fn get_thread_by_id(&self, thread_id: i32) -> Option<Thread> {
+        let mut conn = self.get_connection();
+        threads
+            .find(thread_id)
+            .select(Thread::as_select())
+            .first(&mut conn)
+            .ok()
+    }
 
-    // pub fn update_thread(
-    //     &self,
-    //     thread_id: i32,
-    //     update_thread: UpdateThread,
-    //     auth_user: &AuthenticatedUser,
-    // ) -> Result<Thread, String> {
-    //     let mut conn = self.get_connection();
+    pub fn update_thread(
+        &self,
+        thread_id: i32,
+        update_thread: UpdateThread,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<Thread, String> {
+        let mut conn = self.get_connection();
 
-    //     let thread = self
-    //         .get_thread_by_id(thread_id)
-    //         .ok_or_else(|| "Thread not found".to_string())?;
+        let thread = self
+            .get_thread_by_id(thread_id)
+            .ok_or_else(|| "Thread not found".to_string())?;
 
-    //     if thread.user_id != auth_user.user_id {
-    //         return Err("Unauthorized to update this thread".to_string());
-    //     }
+        if thread.user_id != auth_user.user_id {
+            return Err("Unauthorized to update this thread".to_string());
+        }
 
-    //     diesel::update(threads.find(thread_id))
-    //         .set(update_thread)
-    //         .returning(Thread::as_returning())
-    //         .get_result(&mut conn)
-    //         .map_err(|e| format!("Error updating thread: {}", e))
-    // }
+        diesel::update(threads.find(thread_id))
+            .set(update_thread)
+            .returning(Thread::as_returning())
+            .get_result(&mut conn)
+            .map_err(|e| format!("Error updating thread: {}", e))
+    }
 }

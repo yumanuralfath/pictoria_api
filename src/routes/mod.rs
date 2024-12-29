@@ -13,6 +13,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         users_routes::update_user,
         users_routes::me,
         threads_routes::get_threads,
-        threads_routes::create_thread
+        threads_routes::create_thread,
+        threads_routes::update_thread
     ]
 }
