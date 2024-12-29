@@ -11,4 +11,4 @@ done
 diesel migration run
 
 # Menjalankan aplikasi
-exec pictoria_api
+exec yumana_api
