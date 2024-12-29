@@ -23,32 +23,31 @@ impl<'a> ThreadService<'a> {
 
     pub fn create_thread(
         &self,
-        new_thread: NewThread,
+        mut new_thread: NewThread,
         auth_user: &AuthenticatedUser,
     ) -> Result<Thread, String> {
         let mut conn = self.get_connection();
 
-        let new_thread_with_user = NewThread {
-            user_id: auth_user.user_id,
-            ..new_thread
-        };
+        if new_thread.user_id.is_none() {
+            new_thread.user_id = Some(auth_user.user_id);
+        }
 
         diesel::insert_into(threads)
-            .values(new_thread_with_user)
+            .values(new_thread)
             .returning(Thread::as_returning())
             .get_result(&mut conn)
             .map_err(|e| format!("Error creating thread: {}", e))
     }
 
-    pub fn get_threads(&self, offset: i64, limit: i64) -> Vec<Thread> {
-        let mut conn = self.get_connection();
-        threads
-            .limit(limit)
-            .offset(offset)
-            .select(Thread::as_select())
-            .load::<Thread>(&mut conn)
-            .unwrap_or_default()
-    }
+    // pub fn get_threads(&self, offset: i64, limit: i64) -> Vec<Thread> {
+    //     let mut conn = self.get_connection();
+    //     threads
+    //         .limit(limit)
+    //         .offset(offset)
+    //         .select(Thread::as_select())
+    //         .load::<Thread>(&mut conn)
+    //         .unwrap_or_default()
+    // }
 
     pub fn get_random_threads(&self, limit: i64) -> Vec<Thread> {
         let mut conn = self.get_connection();
@@ -80,7 +79,7 @@ impl<'a> ThreadService<'a> {
     pub fn get_paginated_threads(
         &self,
         limit: i64,
-        offset: i64,
+        _offset: i64,
         page: u32,
         _auth: &AuthenticatedUser,
     ) -> PaginatedThreadResponse {

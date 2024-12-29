@@ -40,13 +40,11 @@ impl ThreadOutput {
     }
 }
 
-impl PaginatedThreadResponse {
-    pub fn from_threads_and_pagination(threads: Vec<Thread>, pagination: PaginationInfo) -> Self {
-        let thread_outputs = threads.into_iter().map(ThreadOutput::from_thread).collect();
-
-        PaginatedThreadResponse {
-            threads: thread_outputs,
-            pagination,
+impl CreateThreadResponse {
+    pub fn from_create_thread(thread: Thread) -> Self {
+        CreateThreadResponse {
+            id: thread.id,
+            message: "thread uploaded successfully".to_string(),
         }
     }
 }

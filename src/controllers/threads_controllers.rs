@@ -1,5 +1,5 @@
 use crate::models::threads::{NewThread, Thread};
-use crate::output::thread_output::{PaginatedThreadResponse, ThreadOutput};
+use crate::output::thread_output::PaginatedThreadResponse;
 use crate::services::threads_services::ThreadService;
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
