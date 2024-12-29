@@ -27,7 +27,7 @@ COPY --from=builder /usr/local/cargo/bin/diesel /usr/local/bin/diesel
 WORKDIR /app
 
 # Menyalin binary aplikasi dan file konfigurasi
-COPY --from=builder /usr/src/app/target/release/pictoria_api /usr/local/bin/pictoria_api
+COPY --from=builder /usr/src/app/target/release/yumana_api /usr/local/bin/yumana_api
 COPY --from=builder /usr/src/app/migrations ./migrations
 COPY diesel.toml ./
 
