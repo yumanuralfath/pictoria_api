@@ -1,4 +1,4 @@
-use crate::models::comments::{Comment, NewComment};
+use crate::models::comments::{Comment, NewComment, UpdateComment};
 use crate::output::comment_output::{CommentOutput, PaginatedCommentResponse};
 use crate::output::pagination_output::PaginationInfo;
 use crate::schema::comments::dsl::*;
@@ -103,5 +103,37 @@ impl<'a> CommentService<'a> {
                 total_items: self.count_comments_by_thread(thread_id_param),
             },
         }
+    }
+
+    fn get_comment_by_id(&self, comment_id: i32) -> Option<Comment> {
+        let mut conn = self.get_connection();
+        comments
+            .find(comment_id)
+            .first::<Comment>(&mut conn)
+            .optional()
+            .unwrap()
+    }
+
+    pub fn update_comment(
+        &self,
+        comment_id: i32,
+        update_comment: UpdateComment,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<Comment, String> {
+        let mut conn = self.get_connection();
+
+        let thread = self
+            .get_comment_by_id(comment_id)
+            .ok_or_else(|| "Comment not found".to_string())?;
+
+        if thread.user_id != auth_user.user_id {
+            return Err("Unauthorized to update this comment".to_string());
+        }
+
+        diesel::update(comments.find(comment_id))
+            .set(update_comment)
+            .returning(Comment::as_returning())
+            .get_result(&mut conn)
+            .map_err(|e| format!("Error updating comment: {}", e))
     }
 }

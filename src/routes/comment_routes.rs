@@ -1,5 +1,5 @@
 use crate::controllers::comments_controllers::CommentController;
-use crate::models::comments::NewComment;
+use crate::models::comments::{NewComment, UpdateComment};
 use crate::output::comment_output::{CreateCommentResponse, PaginatedCommentResponse};
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
@@ -56,4 +56,26 @@ pub async fn get_number_comments_by_thread(
 ) -> Json<i64> {
     let controller = CommentController::new(pool.inner());
     Json(controller.get_number_comments_by_thread(thread_id))
+}
+
+#[put("/comment/<comment_id>", data = "<comment>")]
+pub async fn update_comment(
+    auth: AuthenticatedUser,
+    pool: &State<DbPool>,
+    comment_id: i32,
+    comment: Json<UpdateComment>,
+) -> Result<Json<Value>, (Status, Json<Value>)> {
+    let comment_controller = CommentController::new(pool.inner());
+    match comment_controller.update_comment(comment_id, comment.into_inner(), &auth) {
+        Ok(updated_comment) => Ok(Json(json!({
+            "message": "comment Update successfully",
+            "comment": updated_comment
+        }))),
+        Err(e) => Err((
+            Status::BadRequest,
+            Json(json!({
+                "error": e
+            })),
+        )),
+    }
 }

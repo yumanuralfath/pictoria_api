@@ -39,4 +39,14 @@ impl<'a> CommentController<'a> {
     pub fn get_number_comments_by_thread(&self, thread_id: i32) -> i64 {
         self.service.count_comments_by_thread(thread_id)
     }
+
+    pub fn update_comment(
+        &self,
+        comment_id: i32,
+        update_comment: crate::models::comments::UpdateComment,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<Comment, String> {
+        self.service
+            .update_comment(comment_id, update_comment, auth_user)
+    }
 }
