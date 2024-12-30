@@ -1,3 +1,4 @@
+pub mod comment_routes;
 pub mod routes;
 pub mod threads_routes;
 pub mod users_routes;
@@ -16,6 +17,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         threads_routes::get_threads,
         threads_routes::create_thread,
         threads_routes::update_thread,
-        threads_routes::delete_thread
+        threads_routes::delete_thread,
+        comment_routes::create_comment
     ]
 }
