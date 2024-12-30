@@ -28,7 +28,7 @@ pub async fn create_comment(
     }
 }
 
-#[get("/comment/<thread_id>?<page>&<limit>")]
+#[get("/comments/<thread_id>?<page>&<limit>")]
 pub async fn get_comments(
     _auth: AuthenticatedUser,
     thread_id: i32,
@@ -46,4 +46,14 @@ pub async fn get_comments(
         page.unwrap_or(1),
         &_auth,
     ))
+}
+
+#[get("/comment/<thread_id>")]
+pub async fn get_number_comments_by_thread(
+    _auth: AuthenticatedUser,
+    thread_id: i32,
+    pool: &State<DbPool>,
+) -> Json<i64> {
+    let controller = CommentController::new(pool.inner());
+    Json(controller.get_number_comments_by_thread(thread_id))
 }

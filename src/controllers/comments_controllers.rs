@@ -35,4 +35,8 @@ impl<'a> CommentController<'a> {
         self.service
             .get_paginated_comments_by_thread(thread_id, limit, offset, page, auth_user)
     }
+
+    pub fn get_number_comments_by_thread(&self, thread_id: i32) -> i64 {
+        self.service.count_comments_by_thread(thread_id)
+    }
 }
