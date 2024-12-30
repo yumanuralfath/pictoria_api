@@ -79,3 +79,23 @@ pub async fn update_comment(
         )),
     }
 }
+
+#[delete("/comment/<comment_id>")]
+pub async fn delete_comment(
+    auth: AuthenticatedUser,
+    pool: &State<DbPool>,
+    comment_id: i32,
+) -> Result<Json<Value>, (Status, Json<Value>)> {
+    let comment_controller = CommentController::new(pool.inner());
+    match comment_controller.delete_comment(comment_id, &auth) {
+        Ok(_) => Ok(Json(json!({
+            "message": "comment deleted successfully",
+        }))),
+        Err(e) => Err((
+            Status::BadRequest,
+            Json(json!({
+                "error": e
+            })),
+        )),
+    }
+}

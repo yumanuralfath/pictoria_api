@@ -49,4 +49,12 @@ impl<'a> CommentController<'a> {
         self.service
             .update_comment(comment_id, update_comment, auth_user)
     }
+
+    pub fn delete_comment(
+        &self,
+        comment_id: i32,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<(), String> {
+        self.service.delete_comment(comment_id, auth_user)
+    }
 }

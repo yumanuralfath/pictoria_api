@@ -136,4 +136,25 @@ impl<'a> CommentService<'a> {
             .get_result(&mut conn)
             .map_err(|e| format!("Error updating comment: {}", e))
     }
+
+    pub fn delete_comment(
+        &self,
+        comment_id: i32,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<(), String> {
+        let mut conn = self.get_connection();
+
+        let thread = self
+            .get_comment_by_id(comment_id)
+            .ok_or_else(|| "Comment not found".to_string())?;
+
+        if thread.user_id != auth_user.user_id {
+            return Err("Unauthorized to delete this comment".to_string());
+        }
+
+        diesel::delete(comments.find(comment_id))
+            .execute(&mut conn)
+            .map_err(|e| format!("Error deleting comment: {}", e))
+            .map(|_| ())
+    }
 }

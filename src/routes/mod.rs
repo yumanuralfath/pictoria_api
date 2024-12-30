@@ -21,6 +21,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         comment_routes::create_comment,
         comment_routes::get_comments,
         comment_routes::get_number_comments_by_thread,
-        comment_routes::update_comment
+        comment_routes::update_comment,
+        comment_routes::delete_comment
     ]
 }
