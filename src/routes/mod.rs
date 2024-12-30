@@ -18,6 +18,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         threads_routes::create_thread,
         threads_routes::update_thread,
         threads_routes::delete_thread,
-        comment_routes::create_comment
+        comment_routes::create_comment,
+        comment_routes::get_comments
     ]
 }

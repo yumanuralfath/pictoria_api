@@ -1,4 +1,6 @@
-use crate::models::comments::{Comment, NewComment, UpdateComment};
+use crate::models::comments::{Comment, NewComment};
+use crate::output::comment_output::{CommentOutput, PaginatedCommentResponse};
+use crate::output::pagination_output::PaginationInfo;
 use crate::schema::comments::dsl::*;
 use crate::schema::threads::dsl::{id as thread_id, threads};
 use crate::utils::auth::AuthenticatedUser;
@@ -48,5 +50,58 @@ impl<'a> CommentService<'a> {
             .returning(Comment::as_returning())
             .get_result(&mut conn)
             .map_err(|e| format!("Error creating comment: {}", e))
+    }
+
+    pub fn get_comments_by_thread_id(
+        &self,
+        thread_id_param: i32,
+        offset: i64,
+        limit: i64,
+    ) -> Vec<Comment> {
+        use crate::schema::comments;
+        let mut conn = self.get_connection();
+        comments::table
+            .filter(comments::thread_id.eq(thread_id_param))
+            .limit(limit)
+            .offset(offset)
+            .select(Comment::as_select())
+            .load::<Comment>(&mut conn)
+            .unwrap_or_default()
+    }
+
+    pub fn count_comments_by_thread(&self, thread_id_param: i32) -> i64 {
+        use crate::schema::comments;
+        let mut conn = self.get_connection();
+
+        comments::table
+            .filter(comments::thread_id.eq(thread_id_param))
+            .count()
+            .get_result(&mut conn)
+            .unwrap_or(0)
+    }
+
+    pub fn get_paginated_comments_by_thread(
+        &self,
+        thread_id_param: i32,
+        offset: i64,
+        limit: i64,
+        page: u32,
+        _auth: &AuthenticatedUser,
+    ) -> PaginatedCommentResponse {
+        let comment_list = self.get_comments_by_thread_id(thread_id_param, offset, limit);
+
+        let modified_result = comment_list
+            .into_iter()
+            .map(CommentOutput::from_comment)
+            .collect();
+
+        PaginatedCommentResponse {
+            comments: modified_result,
+            pagination: PaginationInfo {
+                current_page: page,
+                limit: limit as u32,
+                total_items: self.count_comments_by_thread(thread_id_param),
+            },
+        }
     }
 }

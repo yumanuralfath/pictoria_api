@@ -16,7 +16,7 @@ pub struct CommentOutput {
 
 #[derive(Serialize)]
 pub struct PaginatedCommentResponse {
-    pub threads: Vec<CommentOutput>,
+    pub comments: Vec<CommentOutput>,
     pub pagination: PaginationInfo,
 }
 
