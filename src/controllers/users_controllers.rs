@@ -58,4 +58,12 @@ impl<'a> UserController<'a> {
     pub fn update_user(&self, user_id: i32, user: UpdatedUser) -> Result<User, String> {
         self.service.update_user(user_id, user)
     }
+
+    pub fn get_username_by_id(
+        &self,
+        user_id: i32,
+        _auth_user: &AuthenticatedUser,
+    ) -> Option<String> {
+        self.service.get_user_name_by_id(user_id)
+    }
 }

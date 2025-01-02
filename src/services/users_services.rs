@@ -184,4 +184,14 @@ impl<'a> UserService<'a> {
         let mut conn = self.get_connection();
         users.count().get_result(&mut conn).unwrap_or(0)
     }
+
+    pub fn get_user_name_by_id(&self, user_id: i32) -> Option<String> {
+        let mut conn = self.get_connection();
+
+        users
+            .filter(id.eq(user_id))
+            .select(username)
+            .first::<String>(&mut conn)
+            .ok()
+    }
 }

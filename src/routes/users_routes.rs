@@ -144,3 +144,16 @@ pub async fn me(auth: AuthenticatedUser, pool: &State<DbPool>) -> Result<Json<Va
         "user": user
     })))
 }
+
+#[get("/username/<user_id>")]
+pub async fn get_username_by_id(
+    user_id: i32,
+    pool: &State<DbPool>,
+    _auth: AuthenticatedUser,
+) -> Result<Json<Value>, Status> {
+    let user_controller = UserController::new(pool.inner());
+    let username = user_controller.get_username_by_id(user_id, &_auth);
+    Ok(Json(json!({
+        "username": username
+    })))
+}

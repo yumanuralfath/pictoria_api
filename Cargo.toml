@@ -6,13 +6,11 @@ edition = "2021"
 [dependencies]
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
 dotenvy = "0.15"
-tokio = { version = "1.30.0", features = ["full"] }
 diesel = { version = "2.1.0", features = ["postgres", "r2d2", "chrono"] }
 serde = { version = "1.0.200", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = "0.6"
 serde_json = "1.0"
-bcrypt = "0.10.0"
+bcrypt = "0.16.0"
 jsonwebtoken = "9.0.0"
 rocket_cors = "0.6.0"
 regex = "1.10.0"

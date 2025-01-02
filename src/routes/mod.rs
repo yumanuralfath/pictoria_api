@@ -1,3 +1,4 @@
+pub mod chats_routes;
 pub mod comment_routes;
 pub mod routes;
 pub mod threads_routes;
@@ -14,6 +15,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         users_routes::update_user,
         users_routes::me,
         users_routes::delete_user,
+        users_routes::get_username_by_id,
         threads_routes::get_threads,
         threads_routes::create_thread,
         threads_routes::update_thread,
@@ -22,6 +24,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         comment_routes::get_comments,
         comment_routes::get_number_comments_by_thread,
         comment_routes::update_comment,
-        comment_routes::delete_comment
+        comment_routes::delete_comment,
+        chats_routes::create_chat,
     ]
 }
