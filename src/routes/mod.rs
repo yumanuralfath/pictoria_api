@@ -3,6 +3,7 @@ pub mod comment_routes;
 pub mod routes;
 pub mod threads_routes;
 pub mod users_routes;
+pub mod voices_routes;
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![
@@ -26,5 +27,6 @@ pub fn get_routes() -> Vec<rocket::Route> {
         comment_routes::update_comment,
         comment_routes::delete_comment,
         chats_routes::create_chat,
+        voices_routes::save_voice
     ]
 }
