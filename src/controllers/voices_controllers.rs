@@ -1,5 +1,4 @@
 use crate::models::voices::{NewVoiceLog, NewVoiceLogInput, UpdateVoices, Voice};
-use crate::schema::voices_months::voice_id;
 use crate::services::voices_services::VoiceServices;
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
@@ -36,5 +35,13 @@ impl <'a> VoiceController<'a> {
         voice_journal: UpdateVoices,
     ) -> Result<Voice, String> {
         self.service.update_voice_log(voice_log_id, voice_journal, user)
+    }
+
+    pub fn delete_voice(
+        &self, 
+        voice_log_id: i32,
+        user: &AuthenticatedUser
+    ) -> Result<(), String> {
+        self.service.delete_voice_log(voice_log_id, user)
     }
 }

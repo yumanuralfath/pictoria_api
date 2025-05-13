@@ -28,6 +28,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         comment_routes::delete_comment,
         chats_routes::create_chat,
         voices_routes::save_voice,
-        voices_routes::update_voice
+        voices_routes::update_voice,
+        voices_routes::delete_voice
     ]
 }

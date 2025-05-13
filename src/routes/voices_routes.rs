@@ -53,3 +53,24 @@ pub async fn update_voice(
         )),
     }
 }
+
+#[delete("/voice/<id>")]
+pub async fn delete_voice(
+    id: i32,
+    auth: AuthenticatedUser,
+    pool: &State<DbPool>,
+) -> Result<Json<Value>, (Status, Json<Value>)> {
+    let voice_controller = VoiceController::new(pool.inner());
+
+    match  voice_controller.delete_voice(id, &auth) {
+        Ok(_) => Ok(Json(json!({
+            "Message": "Voice log succesfully removed"
+        }))),
+        Err(e)  => Err((
+            Status::BadRequest,
+            Json(json!({
+                    "error": e
+                })),
+        )),
+    }
+}

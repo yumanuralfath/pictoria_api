@@ -1,5 +1,3 @@
-use std::result;
-
 use crate::models::voices::{NewVoiceLog, Voice, UpdateVoices};
 use crate::schema::voices::dsl::*;
 use crate::utils::auth::AuthenticatedUser;
@@ -43,12 +41,24 @@ impl<'a> VoiceServices<'a> {
         .ok()
     }
 
+    fn get_owned_voice_log(&self, voice_log_id: i32, auth_user: &AuthenticatedUser) -> Result<Voice, String> {
+        let voice_log = self
+        .get_voice_log_by_id(voice_log_id)
+        .ok_or_else(|| "Voice log not found".to_string())?;
+
+    if voice_log.user_id != auth_user.user_id {
+        return Err("Unauthorized access to this voice log".to_string());
+    }
+
+    Ok(voice_log)
+    }
+
     pub fn create_voice_log(&self, new_voice_log: NewVoiceLog) -> Result<Voice, String> {
         let mut conn = self.get_connection();
 
         if let Some(existing_voice) = self.get_today_voice()? {
             return Err(format!(
-                "Voice log already exists for today: ({}) {}",
+                "Voice log already exists for today: ({}) {}, Please update or delete voice log",
                 existing_voice.id,
                 existing_voice.voices_journal
             ));
@@ -64,19 +74,24 @@ impl<'a> VoiceServices<'a> {
     pub fn update_voice_log(&self, voice_log_id: i32, update_voice_log:UpdateVoices, auth_user: &AuthenticatedUser) -> Result<Voice, String>{
         let mut conn = self.get_connection();
 
-        let voice_log = self
-            .get_voice_log_by_id(voice_log_id)
-            .ok_or_else(|| "Voice log not found".to_string())?;
-        
-        if voice_log.user_id != auth_user.user_id {
-            return Err("Unauthorized update this voice log".to_string());
-        }
+        let _ = self.get_owned_voice_log(voice_log_id, auth_user)?;
 
         diesel::update(voices.find(voice_log_id))
             .set(update_voice_log)
             .returning(Voice::as_returning())
             .get_result(&mut conn)
             .map_err(|e| format!("Error updating voice: {}", e))
+
     }
 
+    pub fn delete_voice_log(&self, voice_log_id: i32, auth_user: &AuthenticatedUser) -> Result<(), String> {
+        let mut conn = self.get_connection();
+
+        let _ = self.get_owned_voice_log(voice_log_id, auth_user)?;
+        
+        diesel::delete(voices.find(voice_log_id))
+            .execute(&mut conn)
+            .map_err(|e| format!("Error deleting thread: {}", e))
+            .map(|_| ())
+    }
 }
