@@ -22,6 +22,14 @@ impl<'a> UserService<'a> {
         self.pool.get().expect("Failed to get DB connection")
     }
 
+    fn with_connection<F, R>(&self, f: F) -> R  
+    where 
+        F: FnOnce(&mut PgConnection) -> R,
+        {
+            let mut conn = self.get_connection();
+            f(&mut conn)
+        }
+
     fn is_valid_email(new_email: &str) -> Result<(), String> {
         let regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
         if regex.is_match(new_email) {
@@ -32,28 +40,30 @@ impl<'a> UserService<'a> {
     }
 
     fn email_already_exist(&self, new_email: &str) -> Result<(), String> {
-        let mut conn = self.get_connection();
 
-        match users
-        .filter(email.eq(new_email))
-        .select(User::as_select())
-        .first::<User>(&mut conn)
+        self.with_connection(|conn|{
+            match users
+            .filter(email.eq(new_email))
+            .select(User::as_select())
+            .first::<User>(conn)
 
-        {
-            Ok(_) => Err("Email already exists".to_string()),
-            Err(diesel::result::Error::NotFound) => Ok(()),
-            Err(err) => Err(format!("Database error: {}", err)),
-        }
+            {
+                Ok(_) => Err("Email already exists".to_string()),
+                Err(diesel::result::Error::NotFound) => Ok(()),
+                Err(err) => Err(format!("Database error: {}", err)),
+            }
+        })
     }
 
-    fn get_users(&self, offset: i64, limit: i64) -> Vec<User> {
-        let mut conn = self.get_connection();
-        users
+    fn get_users(&self, offset: i64, limit: i64) -> Vec<User> {        
+        self.with_connection(|conn|{
+            users
             .limit(limit)
             .offset(offset)
             .select(User::as_select())
-            .load::<User>(&mut conn)
+            .load::<User>(conn)
             .expect("Error loading users")
+        })
     }
 
     pub fn get_paginated_users(
@@ -82,13 +92,14 @@ impl<'a> UserService<'a> {
     }
 
     pub fn get_user(&self, user_id: i32, _auth_user: &AuthenticatedUser) -> Option<UserOutput> {
-        let mut conn = self.get_connection();
-        users
+        self.with_connection(|conn|{
+            users
             .find(user_id)
             .select(User::as_select())
-            .first::<User>(&mut conn)
+            .first::<User>(conn)
             .ok()
             .map(UserOutput::from_user)
+        })
     }
 
     pub fn create_user(&self, mut new_user: NewUser) -> Result<User, String> {
@@ -100,18 +111,20 @@ impl<'a> UserService<'a> {
         Self::email_already_exist(&self, &new_user.email)?;
         Self::is_valid_email(&new_user.email)?;
 
-        let mut conn = self.get_connection();
         new_user.password = hash_password(&new_user.password);
-
+        
         if new_user.profile_picture_url.is_none() {
             new_user.profile_picture_url = Some("https://picsum.photos/980/980".to_string());
         }
-
-        diesel::insert_into(users)
+        
+        self.with_connection(|conn|{
+            diesel::insert_into(users)
             .values(new_user)
             .returning(User::as_returning())
-            .get_result(&mut conn)
+            .get_result(conn)
             .map_err(|e| format!("Error creating user: {}", e))
+        })
+
     }
 
     pub fn login(&self, credentials: LoginCredentials) -> Option<LoginResponse> {

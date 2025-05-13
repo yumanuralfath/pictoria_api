@@ -26,3 +26,9 @@ pub struct NewVoiceLog {
 pub struct NewVoiceLogInput {
     pub voices_journal: String,
 }
+
+#[derive(AsChangeset, Deserialize)]
+#[diesel(table_name = voices)]
+pub struct UpdateVoices {
+    pub voices_journal: Option<String>,
+}
