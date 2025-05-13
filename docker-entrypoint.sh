@@ -3,7 +3,7 @@ set -e
 
 # Menunggu database siap
 until diesel setup; do
-  echo "Waiting for database to be ready..."
+  echo "Waiting for database to be ready... salam dari yuma"
   sleep 2
 done
 

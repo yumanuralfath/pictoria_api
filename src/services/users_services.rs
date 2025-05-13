@@ -31,6 +31,21 @@ impl<'a> UserService<'a> {
         }
     }
 
+    fn email_already_exist(&self, new_email: &str) -> Result<(), String> {
+        let mut conn = self.get_connection();
+
+        match users
+        .filter(email.eq(new_email))
+        .select(User::as_select())
+        .first::<User>(&mut conn)
+
+        {
+            Ok(_) => Err("Email already exists".to_string()),
+            Err(diesel::result::Error::NotFound) => Ok(()),
+            Err(err) => Err(format!("Database error: {}", err)),
+        }
+    }
+
     fn get_users(&self, offset: i64, limit: i64) -> Vec<User> {
         let mut conn = self.get_connection();
         users
@@ -82,6 +97,7 @@ impl<'a> UserService<'a> {
             return Err("Username, email, and password are required.".to_string());
         }
 
+        Self::email_already_exist(&self, &new_user.email)?;
         Self::is_valid_email(&new_user.email)?;
 
         let mut conn = self.get_connection();
