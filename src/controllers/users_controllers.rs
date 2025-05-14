@@ -42,6 +42,13 @@ impl<'a> UserController<'a> {
         self.service.login(credentials)
     }
 
+    pub fn is_admin_user(
+        &self,
+        auth_user: &AuthenticatedUser
+    ) -> Result<(), String> {
+        self.service.is_admin_user(auth_user)
+    }
+
     pub fn edit_user(
         &self,
         user_id: i32,

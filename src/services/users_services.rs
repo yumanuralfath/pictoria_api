@@ -152,6 +152,16 @@ impl<'a> UserService<'a> {
         }
     }
 
+    pub fn is_admin_user(
+        &self,
+        auth_user: &AuthenticatedUser
+    ) -> Result<(), String> {
+        if !auth_user.is_admin {
+            return Err("Unauthorized: Only admins can use this feature.".to_string());
+        }
+        Ok(())
+    }
+
     pub fn edit_user(
         &self,
         user_id: i32,

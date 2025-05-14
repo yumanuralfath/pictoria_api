@@ -4,6 +4,7 @@ pub mod routes;
 pub mod threads_routes;
 pub mod users_routes;
 pub mod voices_routes;
+pub mod openai_routes;
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![
@@ -29,6 +30,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         chats_routes::create_chat,
         voices_routes::save_voice,
         voices_routes::update_voice,
-        voices_routes::delete_voice
+        voices_routes::delete_voice,
+        openai_routes::generate
     ]
 }

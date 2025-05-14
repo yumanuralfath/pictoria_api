@@ -33,3 +33,8 @@ pub struct UpdateChat {
     pub message: Option<String>,
     pub updated_at: Option<NaiveDateTime>,
 }
+
+#[derive(Deserialize)]
+pub struct PromptRequest {
+    pub prompt: String,
+}
