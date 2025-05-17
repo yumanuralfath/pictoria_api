@@ -1,5 +1,6 @@
-use std::fs;
 use serde::Deserialize;
+
+const CONTEXT_JSON: &str = include_str!("../../context.json"); 
 
 #[derive(Deserialize)]
 struct ContextItem {
@@ -8,8 +9,7 @@ struct ContextItem {
 }
 
 pub fn search_context_from_json(user_prompt: &str) -> String {
-    let file_content = fs::read_to_string("context.json").expect("Failed to read context.json");
-    let items: Vec<ContextItem> = serde_json::from_str(&file_content).expect("Invalid JSON format");
+    let items: Vec<ContextItem> = serde_json::from_str(CONTEXT_JSON).expect("Invalid JSON format");
 
     let lower_prompt = user_prompt.to_lowercase();
     let mut matched = vec![];
@@ -20,7 +20,6 @@ pub fn search_context_from_json(user_prompt: &str) -> String {
         }
     }
 
-    // Fallback jika tidak ada kecocokan
     if matched.is_empty() {
         items.iter().map(|i| i.content.clone()).collect::<Vec<_>>().join(" ")
     } else {
