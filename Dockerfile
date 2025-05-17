@@ -20,7 +20,7 @@ RUN cargo build --release
 FROM debian:bookworm-slim
 
 # Menginstal library runtime yang diperlukan dan diesel CLI
-RUN apt-get update && apt-get install -y libpq-dev && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libpq-dev ca-certificates && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/cargo/bin/diesel /usr/local/bin/diesel
 
 # Set direktori kerja di dalam container
