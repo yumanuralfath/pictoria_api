@@ -8,7 +8,7 @@ struct ContextItem {
 }
 
 pub fn search_context_from_json(user_prompt: &str) -> String {
-    let file_content = fs::read_to_string("src/utils/context.json").expect("Failed to read context.json");
+    let file_content = fs::read_to_string("context.json").expect("Failed to read context.json");
     let items: Vec<ContextItem> = serde_json::from_str(&file_content).expect("Invalid JSON format");
 
     let lower_prompt = user_prompt.to_lowercase();
