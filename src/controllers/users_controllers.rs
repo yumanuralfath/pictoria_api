@@ -42,11 +42,19 @@ impl<'a> UserController<'a> {
         self.service.login(credentials)
     }
 
-    pub fn is_admin_user(
+    // Not use for Now EHE
+    // pub fn is_admin_user(
+    //     &self,
+    //     auth_user: &AuthenticatedUser
+    // ) -> Result<(), String> {
+    //     self.service.is_admin_user(auth_user)
+    // }
+
+    pub fn is_active_user(
         &self,
         auth_user: &AuthenticatedUser
     ) -> Result<(), String> {
-        self.service.is_admin_user(auth_user)
+        self.service.is_active_user(auth_user)
     }
 
     pub fn edit_user(

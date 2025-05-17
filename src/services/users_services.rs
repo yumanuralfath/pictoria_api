@@ -152,12 +152,23 @@ impl<'a> UserService<'a> {
         }
     }
 
-    pub fn is_admin_user(
+    // Maybe next time bro
+    // pub fn is_admin_user(
+    //     &self,
+    //     auth_user: &AuthenticatedUser
+    // ) -> Result<(), String> {
+    //     if !auth_user.is_admin {
+    //         return Err("Unauthorized: Only admins can use this feature.".to_string());
+    //     }
+    //     Ok(())
+    // }
+
+    pub fn is_active_user(
         &self,
         auth_user: &AuthenticatedUser
     ) -> Result<(), String> {
-        if !auth_user.is_admin {
-            return Err("Unauthorized: Only admins can use this feature.".to_string());
+        if auth_user.user_id.is_negative() {
+            return Err("Unauthorized: Only User can use this feature.".to_string());
         }
         Ok(())
     }
