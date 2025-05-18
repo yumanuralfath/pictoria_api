@@ -67,10 +67,17 @@ impl<'a> ThreadService<'a> {
         }
 
         // Langkah 2: Ambil thread berdasarkan ID acak
-        threads
-            .filter(id.eq_any(random_ids)) // Filter berdasarkan ID yang dipilih
+        let mut threads_result = threads
+            .filter(id.eq_any(&random_ids))
             .load::<Thread>(&mut conn)
-            .unwrap_or_default()
+            .unwrap_or_default();
+    
+        // Urutkan hasil sesuai urutan random_ids
+        threads_result.sort_by_key(|thread| {
+            random_ids.iter().position(|&r_id| r_id == thread.id).unwrap_or(usize::MAX)
+    });
+    
+    threads_result
     }
 
     pub fn count_threads(&self) -> i64 {
