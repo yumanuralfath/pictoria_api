@@ -21,7 +21,7 @@ pub async fn get_threads(
     let controller = ThreadController::new(pool.inner());
     let (offset, limit_val) = paginate(page, limit);
 
-    Json(controller.get_paginated_threads(offset, limit_val, page.unwrap_or(1), &_auth))
+    Json(controller.get_paginated_threads(limit_val, offset, page.unwrap_or(1), &_auth))
 }
 
 #[post("/thread", data = "<thread>")]

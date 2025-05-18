@@ -4,6 +4,7 @@ use crate::output::thread_output::{PaginatedThreadResponse, ThreadOutput};
 use crate::schema::threads::dsl::*;
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
+use diesel::dsl::sql;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
 
@@ -38,38 +39,39 @@ impl<'a> ThreadService<'a> {
             .map_err(|e| format!("Error creating thread: {}", e))
     }
 
-    pub fn get_threads(&self, offset: i64, limit: i64) -> Vec<Thread> {
-        let mut conn = self.get_connection();
-        threads
-            .limit(limit)
-            .offset(offset)
-            .select(Thread::as_select())
-            .load::<Thread>(&mut conn)
-            .unwrap_or_default()
-    }
-
-    //UWU gak jadi di pake wkkwkwwk
-    // pub fn get_random_threads(&self, limit: i64) -> Vec<Thread> {
+    //uwu ini yang tidak di pakai
+    // pub fn get_threads(&self, offset: i64, limit: i64) -> Vec<Thread> {
     //     let mut conn = self.get_connection();
-
-    //     // Langkah 1: Ambil ID secara acak dengan limit
-    //     let random_ids: Vec<i32> = threads
-    //         .select(id) // Mengakses kolom `id` dari `threads`
-    //         .order_by(sql::<diesel::sql_types::Text>("RANDOM()")) // Acak ID
-    //         .limit(limit)
-    //         .load::<i32>(&mut conn)
-    //         .unwrap_or_default();
-
-    //     if random_ids.is_empty() {
-    //         return vec![];
-    //     }
-
-    //     // Langkah 2: Ambil thread berdasarkan ID acak
     //     threads
-    //         .filter(id.eq_any(random_ids)) // Filter berdasarkan ID yang dipilih
+    //         .limit(limit)
+    //         .offset(offset)
+    //         .select(Thread::as_select())
     //         .load::<Thread>(&mut conn)
     //         .unwrap_or_default()
     // }
+
+    // UWU akhirnya kepake wkkwkwwk
+    pub fn get_random_threads(&self, limit: i64) -> Vec<Thread> {
+        let mut conn = self.get_connection();
+
+        // Langkah 1: Ambil ID secara acak dengan limit
+        let random_ids: Vec<i32> = threads
+            .select(id) // Mengakses kolom `id` dari `threads`
+            .order_by(sql::<diesel::sql_types::Text>("RANDOM()")) // Acak ID
+            .limit(limit)
+            .load::<i32>(&mut conn)
+            .unwrap_or_default();
+
+        if random_ids.is_empty() {
+            return vec![];
+        }
+
+        // Langkah 2: Ambil thread berdasarkan ID acak
+        threads
+            .filter(id.eq_any(random_ids)) // Filter berdasarkan ID yang dipilih
+            .load::<Thread>(&mut conn)
+            .unwrap_or_default()
+    }
 
     pub fn count_threads(&self) -> i64 {
         let mut conn = self.get_connection();
@@ -78,12 +80,12 @@ impl<'a> ThreadService<'a> {
 
     pub fn get_paginated_threads(
         &self,
-        offset: i64,
+        _offset: i64,
         limit: i64,
         page: u32,
         _auth: &AuthenticatedUser,
     ) -> PaginatedThreadResponse {
-        let thread_list = self.get_threads(offset, limit);
+        let thread_list = self.get_random_threads(limit);
 
         let modified_result = thread_list
             .into_iter()
