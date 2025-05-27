@@ -2692,7 +2692,6 @@ dependencies = [
  "rocket_cors",
  "serde",
  "serde_json",
- "tokio",
  "urlencoding",
  "validator",
 ]

@@ -6,7 +6,6 @@ Pictoria API adalah aplikasi web yang dibangun menggunakan Rust dan framework Ro
 
 - **RESTful API**: Menggunakan Rocket untuk membangun API yang cepat dan efisien.
 - **Database**: Menggunakan Diesel untuk interaksi dengan database PostgreSQL.
-- **Asynchronous**: Memanfaatkan Tokio untuk operasi non-blok.
 
 ## Prerequisites
 
