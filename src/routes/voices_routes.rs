@@ -106,18 +106,15 @@ pub async fn get_voice_log_by_date(
     }
 }
 
-#[get("/voicesweeks")]
-pub async fn get_weekly_resume_voice(
-    auth: AuthenticatedUser,
+#[get("/voice/weekly-resume")]
+pub async fn weekly_resume(
+    auth_user: AuthenticatedUser,
     pool: &State<DbPool>
-) -> Result<Json<VoicesWeeks>, Status> {
+) -> Result<Json<VoicesWeeks>, (Status, String)> {
     let voice_controller = VoiceController::new(pool.inner());
 
-    match voice_controller.get_weekly_resume_voice(auth).await {
-        Ok(result) => Ok(Json(result)),
-        Err(e) => {
-            eprintln!("Error creating weekly resume: {}", e);
-            Err(Status::InternalServerError)
-        }
+    match voice_controller.get_weekly_resume_voice(auth_user).await {
+        Ok(data) => Ok(Json(data)),
+        Err(msg) => Err((Status::BadRequest, msg)), 
     }
 }

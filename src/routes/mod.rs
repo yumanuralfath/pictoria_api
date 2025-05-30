@@ -33,6 +33,6 @@ pub fn get_routes() -> Vec<rocket::Route> {
         voices_routes::delete_voice,
         openai_routes::generate,
         voices_routes::get_voice_log_by_date,
-        voices_routes::get_weekly_resume_voice
+        voices_routes::weekly_resume
     ]
 }

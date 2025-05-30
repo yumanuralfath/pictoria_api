@@ -149,7 +149,7 @@ impl<'a> VoiceServices<'a> {
             .collect::<Vec<_>>()
             .join("\n\n");
 
-        let context_weekly = "Buatkan resume per poin dari agenda yang telah dilakukan selama seminggu ini".to_string();
+        let context_weekly = "Buatkan resume per poin dari apa saja yang telah disimpan dalam journal lalu berika kesimpulan mengenai apa saja yang telah di pelajari selama seminggu dan gambaran tentang si pembuat jurnal ini ".to_string();
 
         let response = deepseek_chat(weekly_voices_collect, context_weekly).await?;
         let voices_week_journal = response.get("content").and_then(Value::as_str).unwrap_or("").to_string();
