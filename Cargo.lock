@@ -2686,6 +2686,7 @@ dependencies = [
  "diesel",
  "dotenvy",
  "jsonwebtoken",
+ "once_cell",
  "regex",
  "reqwest",
  "rocket",

@@ -8,6 +8,7 @@ mod routes;
 mod schema;
 mod services;
 mod utils;
+mod library;
 
 use crate::routes::get_routes;
 use dotenvy::dotenv;

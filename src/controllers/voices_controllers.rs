@@ -1,4 +1,6 @@
-use crate::models::voices::{NewVoiceLog, NewVoiceLogInput, UpdateVoices, Voice};
+use chrono::NaiveDate;
+
+use crate::models::voices::{NewVoiceLog, NewVoiceLogInput, UpdateVoices, Voice, VoicesWeeks};
 use crate::services::voices_services::VoiceServices;
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
@@ -43,5 +45,20 @@ impl <'a> VoiceController<'a> {
         user: &AuthenticatedUser
     ) -> Result<(), String> {
         self.service.delete_voice_log(voice_log_id, user)
+    }
+
+    pub fn get_voice_log_by_date(
+        &self,
+        user: AuthenticatedUser,
+        date: NaiveDate
+    ) -> Result<Option<Voice>, String> {
+        self.service.get_voice_log_by_date(user, date)
+    }
+
+    pub async  fn get_weekly_resume_voice(
+        &self,
+        user: AuthenticatedUser
+    ) -> Result<VoicesWeeks, String>{
+        self.service.get_weekly_resume_voice(&user).await
     }
 }

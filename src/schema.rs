@@ -72,10 +72,17 @@ diesel::table! {
     voices_weeks (id) {
         id -> Int4,
         user_id -> Int4,
-        voice_id -> Int4,
         voices_week_journal -> Text,
         created_at -> Nullable<Timestamp>,
         updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    voices_weeks_voices (id) {
+        id -> Int4,
+        voices_week_id -> Int4,
+        voice_id -> Int4,
     }
 }
 
@@ -86,7 +93,8 @@ diesel::joinable!(voices -> users (user_id));
 diesel::joinable!(voices_months -> users (user_id));
 diesel::joinable!(voices_months -> voices_weeks (voice_id));
 diesel::joinable!(voices_weeks -> users (user_id));
-diesel::joinable!(voices_weeks -> voices (voice_id));
+diesel::joinable!(voices_weeks_voices -> voices (voice_id));
+diesel::joinable!(voices_weeks_voices -> voices_weeks (voices_week_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     chats,
@@ -96,4 +104,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     voices,
     voices_months,
     voices_weeks,
+    voices_weeks_voices,
 );
