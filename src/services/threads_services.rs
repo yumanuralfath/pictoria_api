@@ -90,7 +90,6 @@ impl<'a> ThreadService<'a> {
         _offset: i64,
         limit: i64,
         page: u32,
-        _auth: &AuthenticatedUser,
     ) -> PaginatedThreadResponse {
         let thread_list = self.get_random_threads(limit);
 

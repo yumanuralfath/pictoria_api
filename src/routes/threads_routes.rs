@@ -13,7 +13,6 @@ use validator::Validate;
 
 #[get("/threads?<page>&<limit>")]
 pub async fn get_threads(
-    _auth: AuthenticatedUser,
     page: Option<u32>,
     limit: Option<u32>,
     pool: &State<DbPool>,
@@ -21,7 +20,7 @@ pub async fn get_threads(
     let controller = ThreadController::new(pool.inner());
     let (offset, limit_val) = paginate(page, limit);
 
-    Json(controller.get_paginated_threads(limit_val, offset, page.unwrap_or(1), &_auth))
+    Json(controller.get_paginated_threads(limit_val, offset, page.unwrap_or(1)))
 }
 
 #[post("/thread", data = "<thread>")]

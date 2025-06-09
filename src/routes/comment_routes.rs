@@ -30,7 +30,6 @@ pub async fn create_comment(
 
 #[get("/comments/<thread_id>?<page>&<limit>")]
 pub async fn get_comments(
-    _auth: AuthenticatedUser,
     thread_id: i32,
     page: Option<u32>,
     limit: Option<u32>,
@@ -43,8 +42,7 @@ pub async fn get_comments(
         thread_id,
         offset,
         limit_val,
-        page.unwrap_or(1),
-        &_auth,
+        page.unwrap_or(1)
     ))
 }
 

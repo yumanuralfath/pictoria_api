@@ -29,11 +29,10 @@ impl<'a> CommentController<'a> {
         thread_id: i32,
         limit: i64,
         offset: i64,
-        page: u32,
-        auth_user: &AuthenticatedUser,
+        page: u32
     ) -> PaginatedCommentResponse {
         self.service
-            .get_paginated_comments_by_thread(thread_id, limit, offset, page, auth_user)
+            .get_paginated_comments_by_thread(thread_id, limit, offset, page)
     }
 
     pub fn get_number_comments_by_thread(&self, thread_id: i32) -> i64 {

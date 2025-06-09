@@ -28,10 +28,9 @@ impl<'a> ThreadController<'a> {
         limit: i64,
         offset: i64,
         page: u32,
-        auth_user: &AuthenticatedUser,
     ) -> PaginatedThreadResponse {
         self.service
-            .get_paginated_threads(offset, limit, page, auth_user)
+            .get_paginated_threads(offset, limit, page)
     }
 
     pub fn edit_thread(

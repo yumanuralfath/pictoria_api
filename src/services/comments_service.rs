@@ -85,8 +85,7 @@ impl<'a> CommentService<'a> {
         thread_id_param: i32,
         offset: i64,
         limit: i64,
-        page: u32,
-        _auth: &AuthenticatedUser,
+        page: u32
     ) -> PaginatedCommentResponse {
         let comment_list = self.get_comments_by_thread_id(thread_id_param, offset, limit);
 
