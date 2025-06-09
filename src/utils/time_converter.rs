@@ -1,4 +1,4 @@
-use chrono::{Duration, FixedOffset, NaiveDate, NaiveDateTime, TimeZone};
+use chrono::{FixedOffset, NaiveDate, NaiveDateTime, TimeZone, Duration};
 use rocket::{http::Status, serde::json::Json};
 use serde_json::{json, Value};
 
@@ -36,11 +36,17 @@ pub fn get_today_date() -> NaiveDate {
     today_date
 }
 
-//Get weekly date
 pub fn get_weekly_date(date: NaiveDate) -> Vec<NaiveDateTime> {
     let weekly_dates = (0..7)
         .map(|i| date - Duration::days(i));
 
     let result = weekly_dates.into_iter().map(|d| d.and_hms_opt(0, 0, 0).unwrap()).collect();
+    result
+}
+
+pub fn get_monthly_date(date: NaiveDate) -> Vec<NaiveDateTime> {
+    let monthly_date = (0..30).map(|i| date - Duration::days(i));
+    let result = monthly_date.into_iter().map(|d| d.and_hms_opt(0, 0, 0).unwrap()).collect();
+
     result
 }

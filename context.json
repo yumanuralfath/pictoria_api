@@ -1,15 +1,42 @@
 [
-    {
-        "topic": "siapa kamu?",
-        "content": "Hi aku adalah alfath ai merupakan chat bot AI dengan model deepseek yang telah dilakukan tuning RAG oleh yuma"
-    },
-    {
-        "topic":"yuma nur alfath",
-        "content":"yuma nur alfath adalah pembuat website ini"
-    },
-    {
-        "topic":"yuma",
-        "content":"yuma nur alfath hanya sarjana kimia yang hobi membuat aplikasi project pribadi dengan react dan rocket rust untuk backend dan bisa langsung ke website pribadi nya https://yumana.my.id"
-    }
-  ]
-  
+  {
+    "topic": "siapa kamu?",
+    "keywords": ["bot", "alfath ai", "ini siapa"],
+    "content": "Hai! Saya adalah Alfath AI, sebuah chatbot yang dibangun menggunakan model DeepSeek. Saya telah di-tuning secara khusus dengan metode RAG oleh Yuma."
+  },
+  {
+    "topic": "yuma nur alfath",
+    "keywords": ["yuma", "pembuat", "developer"],
+    "content": "Yuma Nur Alfath adalah developer yang membuat website ini serta Alfath AI."
+  },
+  {
+    "topic": "latar belakang yuma",
+    "keywords": ["hobi", "keahlian", "teknologi", "react", "rust"],
+    "content": "Meskipun seorang Sarjana Kimia, Yuma memiliki hobi membuat aplikasi. Ia menggunakan React untuk frontend dan Rocket (Rust) untuk backend. Untuk info lebih lanjut, kunjungi website pribadinya di https://yumana.my.id."
+  },
+  {
+    "topic": "kemampuan_ai",
+    "keywords": ["bisa apa", "kamu bisa apa", "bantuan", "help", "kemampuan"],
+    "content": "Saya bisa memberikan informasi tentang Yuma sebagai developer, teknologi yang digunakan di website ini, dan cara menghubunginya. Tanyakan saja apa yang ingin Anda ketahui tentang topik-topik tersebut!"
+  },
+  {
+    "topic": "tujuan_website",
+    "keywords": ["tujuan", "website ini tentang apa", "fungsi website"],
+    "content": "Website ini berfungsi sebagai portofolio digital dan 'playground' bagi Yuma untuk bereksperimen dengan teknologi web, khususnya React dan Rust. Ini adalah tempat ia menampilkan proyek dan kemampuannya."
+  },
+  {
+    "topic": "kontak_developer",
+    "keywords": ["kontak", "email", "hubungi", "sosial media", "linkedin", "github"],
+    "content": "Anda bisa menghubungi Yuma melalui email di yumanuralfath2@gmail.com atau melihat profil profesionalnya di LinkedIn dan GitHub yang bisa diakses dari website utamanya, https://yumana.my.id."
+  },
+  {
+    "topic": "status_pekerjaan",
+    "keywords": ["open to work", "lowongan", "kerja", "rekrut", "hire", "freelance"],
+    "content": "Saat ini, Yuma terbuka untuk peluang kerja (open to work) dan proyek freelance. Jika Anda memiliki tawaran menarik atau ingin berdiskusi, jangan ragu untuk menghubunginya."
+  },
+  {
+    "topic": "kisah_developer",
+    "keywords": ["kenapa programming", "dari kimia", "cerita", "kisah", "pindah karir"],
+    "content": "Yuma menemukan bahwa proses merancang logika dan membangun sesuatu dari nol di dunia programming memberikan kepuasan yang luar biasa, mirip seperti merancang eksperimen di laboratorium. Baginya, keduanya sama-sama tentang pemecahan masalah secara kreatif, dan ia sangat menikmati tantangan di dunia teknologi."
+  }
+]

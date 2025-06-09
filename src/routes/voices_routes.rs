@@ -6,6 +6,7 @@ use serde_json::json;
 use crate::controllers::voices_controllers::VoiceController;
 use crate::models::voices::NewVoiceLogInput;
 use crate::models::voices::UpdateVoices;
+use crate::models::voices::VoicesMonths;
 use crate::models::voices::VoicesWeeks;
 use crate::output::voice_output::SaveVoiceOutput;
 use crate::utils::auth::AuthenticatedUser;
@@ -116,5 +117,18 @@ pub async fn weekly_resume(
     match voice_controller.get_weekly_resume_voice(auth_user).await {
         Ok(data) => Ok(Json(data)),
         Err(msg) => Err((Status::BadRequest, msg)), 
+    }
+}
+
+#[get("/voice/monthly-resume")]
+pub async fn monthly_resume(
+    auth_user: AuthenticatedUser,
+    pool: &State<DbPool>
+) -> Result<Json<VoicesMonths>, (Status, String)> {
+    let voice_controllers = VoiceController::new(pool.inner());
+
+    match voice_controllers.get_monthly_resume_voice(auth_user).await {
+        Ok(data) => Ok(Json(data)),
+        Err(msg) => Err((Status::BadRequest, msg)),
     }
 }

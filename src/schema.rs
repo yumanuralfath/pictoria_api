@@ -59,12 +59,19 @@ diesel::table! {
     voices_months (id) {
         id -> Int4,
         user_id -> Int4,
-        voice_id -> Int4,
         voices_month_journal -> Text,
-        #[max_length = 7]
+        #[max_length = 20]
         month -> Varchar,
         created_at -> Nullable<Timestamp>,
         updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    voices_months_voices (id) {
+        id -> Int4,
+        voices_month_id -> Int4,
+        voice_id -> Int4,
     }
 }
 
@@ -91,7 +98,8 @@ diesel::joinable!(comments -> users (user_id));
 diesel::joinable!(threads -> users (user_id));
 diesel::joinable!(voices -> users (user_id));
 diesel::joinable!(voices_months -> users (user_id));
-diesel::joinable!(voices_months -> voices_weeks (voice_id));
+diesel::joinable!(voices_months_voices -> voices (voice_id));
+diesel::joinable!(voices_months_voices -> voices_months (voices_month_id));
 diesel::joinable!(voices_weeks -> users (user_id));
 diesel::joinable!(voices_weeks_voices -> voices (voice_id));
 diesel::joinable!(voices_weeks_voices -> voices_weeks (voices_week_id));
@@ -103,6 +111,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     users,
     voices,
     voices_months,
+    voices_months_voices,
     voices_weeks,
     voices_weeks_voices,
 );

@@ -1,4 +1,4 @@
-use crate::schema::{voices, voices_weeks, voices_weeks_voices};
+use crate::schema::{voices, voices_weeks, voices_weeks_voices, voices_months, voices_months_voices};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -66,5 +66,33 @@ pub struct NewVoicesWeeks {
 #[diesel(table_name = voices_weeks_voices)]
 pub struct NewVoicesWeeksVoices {
     pub voices_week_id: i32,
+    pub voice_id: i32,
+}
+
+#[derive(Debug, Queryable, Selectable, Identifiable, Serialize, Deserialize, Insertable)]
+#[diesel(table_name = voices_months)]
+pub struct VoicesMonths {
+    pub id: i32,
+    pub user_id: i32,
+    pub voices_month_journal: String,
+    pub month: String,
+    pub created_at: Option<NaiveDateTime>,
+    pub updated_at: NaiveDateTime
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = voices_months)]
+pub struct NewVoicesMonths<'a> {
+    pub user_id: i32,
+    pub voices_month_journal: &'a str,
+    pub month: &'a str,
+    pub created_at: Option<NaiveDateTime>,
+    pub updated_at: NaiveDateTime,
+}
+
+#[derive(Insertable, Debug)]
+#[diesel(table_name = voices_months_voices)]
+pub struct NewVoicesMonthsVoices {
+    pub voices_month_id: i32,
     pub voice_id: i32,
 }
