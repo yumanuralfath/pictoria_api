@@ -114,7 +114,7 @@ impl<'a> UserService<'a> {
         new_user.password = hash_password(&new_user.password);
         
         if new_user.profile_picture_url.is_none() {
-            new_user.profile_picture_url = Some("https://picsum.photos/980/980".to_string());
+            new_user.profile_picture_url = Some("https://yumana.my.id/default-avatar.png".to_string());
         }
         
         self.with_connection(|conn|{

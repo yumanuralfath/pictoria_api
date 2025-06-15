@@ -29,12 +29,13 @@ impl<'a> VoiceServices<'a> {
         self.pool.get().expect("Failed to get DB connection")
     }
 
-    fn get_today_voice(&self) -> Result<Option<Voice>, String> {
+    fn get_today_voice(&self, auth_user: &AuthenticatedUser) -> Result<Option<Voice>, String> {
         let mut conn = self.get_connection();
     
         let date_now = get_today_date();
     
         voices
+            .filter(voices_dsl::user_id.eq(auth_user.user_id))
             .filter(voices_dsl::created_at.ge(date_now.and_hms_opt(0, 0, 0).unwrap()))
             .filter(voices_dsl::created_at.lt(date_now.succ_opt().unwrap().and_hms_opt(0, 0, 0).unwrap()))
             .first::<Voice>(&mut conn)
@@ -126,10 +127,35 @@ impl<'a> VoiceServices<'a> {
             .map_err(|err| format!("DB Error: {}", err))
     }
 
-    pub fn create_voice_log(&self, new_voice_log: NewVoiceLog) -> Result<Voice, String> {
+    pub fn get_active_dates_in_month(
+        &self,
+        auth_user: &AuthenticatedUser,
+        date: NaiveDate,
+    ) -> Result<Vec<NaiveDate>, String> {
+        use diesel::dsl::sql;
+        use diesel::sql_types::Date;
+
         let mut conn = self.get_connection();
 
-        if let Some(existing_voice) = self.get_today_voice()? {
+        let monthly_dates = get_monthly_date(date);
+        let monthly_date_min = monthly_dates.iter().min().unwrap();
+        let monthly_date_max = monthly_dates.iter().max().unwrap();
+
+        let results: Vec<NaiveDate> = voices
+            .filter(voices_dsl::user_id.eq(auth_user.user_id))
+            .filter(voices_dsl::created_at.between(monthly_date_min, monthly_date_max))
+            .select(sql::<Date>("date(created_at)")) // SQL: convert timestamp -> date
+            .distinct()
+            .load::<NaiveDate>(&mut conn)
+            .map_err(|err| format!("Database error: {}", err))?;
+
+        Ok(results)
+    }
+
+    pub fn create_voice_log(&self, new_voice_log: NewVoiceLog, auth_user: &AuthenticatedUser) -> Result<Voice, String> {
+        let mut conn = self.get_connection();
+
+        if let Some(existing_voice) = self.get_today_voice(auth_user)? {
             return Err(format!(
                 "Voice log already exists for today: ({}) {}, Please update or delete voice log",
                 existing_voice.id,
@@ -168,7 +194,7 @@ impl<'a> VoiceServices<'a> {
             .map(|_| ())
     }
 
-    pub fn get_voice_log_by_date(&self, _auth_user: AuthenticatedUser, date: NaiveDate) -> Result<Option<Voice>, String> {
+    pub fn get_voice_log_by_date(&self, auth_user: AuthenticatedUser, date: NaiveDate) -> Result<Option<Voice>, String> {
         let mut conn = self.get_connection();
 
         let start_of_the_day = date.and_hms_opt(0, 0, 0).expect("invalid start of the day");
@@ -176,11 +202,13 @@ impl<'a> VoiceServices<'a> {
                                                         .expect("Invalid next day start")
                                                         .and_hms_opt(0, 0, 0);
 
-        voices.filter(voices_dsl::created_at.ge(start_of_the_day))
-              .filter(voices_dsl::created_at.lt(next_day_start))
-              .first::<Voice>(&mut conn)
-              .optional()
-              .map_err(|err| format!("DB error: {}", err))
+        voices
+        .filter(voices_dsl::user_id.eq(auth_user.user_id))
+        .filter(voices_dsl::created_at.ge(start_of_the_day))
+        .filter(voices_dsl::created_at.lt(next_day_start))
+        .first::<Voice>(&mut conn)
+        .optional()
+        .map_err(|err| format!("DB error: {}", err))
     }
     
     pub async fn get_weekly_resume_voice(&self, auth_user: &AuthenticatedUser) -> Result<VoicesWeeks, String> {

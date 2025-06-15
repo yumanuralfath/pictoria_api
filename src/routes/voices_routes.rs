@@ -12,6 +12,7 @@ use crate::output::voice_output::SaveVoiceOutput;
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
 use crate::utils::time_converter::parse_param_date;
+use chrono::NaiveDate;
 
 #[post("/voice", data = "<voice_input>")]
 pub async fn save_voice(
@@ -130,5 +131,31 @@ pub async fn monthly_resume(
     match voice_controllers.get_monthly_resume_voice(auth_user).await {
         Ok(data) => Ok(Json(data)),
         Err(msg) => Err((Status::BadRequest, msg)),
+    }
+}
+
+
+#[get("/voice-active/<date>")]
+pub async fn get_active_voice_month(
+    auth: AuthenticatedUser,
+    date: String,
+    pool: &State<DbPool>,
+) -> Result<Json<Vec<NaiveDate>>, (Status, String)> {
+    let voice_controllers = VoiceController::new(pool.inner());
+
+    let parts: Vec<&str> = date.split('-').collect();
+    if parts.len() != 2 {
+        return Err((Status::BadRequest, "Invalid date format. Use YYYY-M".to_string()));
+    }
+
+    let year: i32 = parts[0].parse().map_err(|_| (Status::BadRequest, "Invalid year".to_string()))?;
+    let month: u32 = parts[1].parse().map_err(|_| (Status::BadRequest, "Invalid month".to_string()))?;
+
+    let parsed_date = NaiveDate::from_ymd_opt(year, month, 1)
+        .ok_or((Status::BadRequest, "Invalid date provided".to_string()))?;
+
+    match voice_controllers.get_active_date_monthly(&auth, parsed_date).await {
+        Ok(dates) => Ok(Json(dates)),
+        Err(err) => Err((Status::InternalServerError, err)),
     }
 }

@@ -34,6 +34,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         openai_routes::generate,
         voices_routes::get_voice_log_by_date,
         voices_routes::weekly_resume,
-        voices_routes::monthly_resume
+        voices_routes::monthly_resume,
+        voices_routes::get_active_voice_month
     ]
 }

@@ -26,7 +26,7 @@ impl <'a> VoiceController<'a> {
             created_at: chrono::Utc::now().naive_utc(),
         };
     
-        self.service.create_voice_log(new_voice)
+        self.service.create_voice_log(new_voice, &user)
     }
 
     pub fn edit_voice_journal(
@@ -66,6 +66,14 @@ impl <'a> VoiceController<'a> {
         user: AuthenticatedUser
     ) -> Result<VoicesMonths, String>{
         self.service.get_monthly_resume_voice(&user).await
+    }
+
+    pub async fn get_active_date_monthly(
+        &self,
+        user: &AuthenticatedUser,
+        date: NaiveDate
+    ) -> Result<Vec<NaiveDate>, String>{
+        self.service.get_active_dates_in_month(user, date)
     }
 
 }
