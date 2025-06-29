@@ -5,6 +5,7 @@ pub mod threads_routes;
 pub mod users_routes;
 pub mod voices_routes;
 pub mod openai_routes;
+pub mod cloudinary_routes;
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![
@@ -35,6 +36,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         voices_routes::get_voice_log_by_date,
         voices_routes::weekly_resume,
         voices_routes::monthly_resume,
-        voices_routes::get_active_voice_month
+        voices_routes::get_active_voice_month,
+        cloudinary_routes::upload_profile_pic
     ]
 }

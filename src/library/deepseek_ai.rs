@@ -1,13 +1,7 @@
 use rocket::serde::json::Json;
 use serde_json::{json, Value};
-use std::env;
 use reqwest::Client;
-use once_cell::sync::Lazy;
-
-
-pub static OPENROUTER_API_KEY: Lazy<String> = Lazy::new(|| {
-    env::var("OPENROUTER_API_KEY").expect("OPENROUTER_API_KEY must be set")
-});
+use crate::library::base_lib_key::OPENROUTER_API_KEY;
 
 
 pub async fn deepseek_chat(prompt: String, context: String) -> Result<Json<Value>, String> {
