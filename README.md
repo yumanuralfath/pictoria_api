@@ -1,42 +1,73 @@
-# Pictoria API
+# 🌐 Yumana API
 
-Pictoria API adalah aplikasi web yang dibangun menggunakan Rust dan framework Rocket. Proyek ini bertujuan untuk menyediakan platform interaktif untuk berbagi dan berkolaborasi dalam gambar.
+API backend untuk aplikasi Todo dan Manajemen Akun, dibangun dengan **Rust + Rocket + Diesel** dan menggunakan PostgreSQL sebagai database utama. Mendukung autentikasi JWT dan integrasi Cloudinary untuk upload gambar profil.
 
-## Fitur
+> 🌍 Production URL: **https://api.yumana.my.id**
 
-- **RESTful API**: Menggunakan Rocket untuk membangun API yang cepat dan efisien.
-- **Database**: Menggunakan Diesel untuk interaksi dengan database PostgreSQL.
+---
 
-## Prerequisites
+## 🚀 Tech Stack
 
-Sebelum memulai, pastikan Anda telah menginstal:
+- **Rust**
+- **Rocket** (web framework)
+- **Diesel** (ORM)
+- **PostgreSQL**
+- **JWT** (untuk autentikasi)
+- **Cloudinary** (upload image profil)
 
-- [Rust](https://www.rust-lang.org/tools/install)
-- [PostgreSQL](https://www.postgresql.org/download/)
-- [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
+---
 
-## Instalasi
+## 🛠️ Cara Menjalankan Secara Lokal
 
-1. Clone repositori ini:
-   ```bash
-   git clone https://github.com/yumanuralfath/pictoria_api
-   cd pictoria_api
-   ```
+### 1. Clone repository
+```bash
+git clone https://github.com/username/yumana_api.git
+cd yumana_api
+```
 
-2. Install dependensi:
-   ```bash
-   cargo build
-   ```
+### 2. Buat file .env
+Salin dari env.example:
 
-3. Buat file `.env` di root proyek dan tambahkan konfigurasi database Anda:
-   ```env
-   DATABASE_URL=postgres://username:password@localhost/pictoria_api
-   ```
+```bash
+cp .env.example .env
+```
 
-## Menjalankan Aplikasi
+### 3. Isi variabel di .env:
 
-Untuk menjalankan aplikasi, gunakan perintah berikut:
+```
+DATABASE_URL=postgres://username:password@localhost:5432/yumana_db
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+JWT_SECRET=your_jwt_secret
+```
+
+### 4. Setup database
+```
+diesel setup
+diesel migration run
+```
+### 5. Jalankan server Rocket
 ```
 cargo run
 ```
-Aplikasi akan berjalan di `http://localhost:8000`.
+
+📂 Struktur Direktori (opsional)
+```
+src/
+├── controllers/        # Logika handler endpoint
+├── models/             # Model Diesel & Schema
+├── routes/             # Route groupings
+├── utils/              # Fungsi utilitas (auth, db, dll)
+├── main.rs             # Entry point Rocket
+└── ...
+```
+### ⚙️ Environment Variables
+
+Semua variabel penting tersedia di file .env.example:
+
+    DATABASE_URL — Koneksi ke PostgreSQL
+
+    JWT_SECRET — Secret untuk generate JWT token
+
+    CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME — untuk upload foto
