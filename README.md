@@ -1,6 +1,6 @@
 # 🌐 Yumana API
 
-API backend untuk aplikasi Todo dan Manajemen Akun, dibangun dengan **Rust + Rocket + Diesel** dan menggunakan PostgreSQL sebagai database utama. Mendukung autentikasi JWT dan integrasi Cloudinary untuk upload gambar profil.
+API backend untuk website **https://wwww.yumana.my.id**, dibangun dengan **Rust + Rocket + Diesel** dan menggunakan PostgreSQL sebagai database utama. Mendukung autentikasi JWT dan integrasi Cloudinary untuk upload gambar profil.
 
 > 🌍 Production URL: **https://api.yumana.my.id**
 
