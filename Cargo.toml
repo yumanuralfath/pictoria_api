@@ -18,3 +18,4 @@ once_cell = "1.19"
 validator = { version = "0.19", features = ["derive"] }
 reqwest = { version = "0.11", features = ["json", "multipart", "stream"] }
 urlencoding = "2.1.2"
+redis = { version = "0.23.0", features = ["tls-native-tls"]}

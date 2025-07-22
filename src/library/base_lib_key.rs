@@ -21,3 +21,7 @@ pub static CLOUDINARY_API_CLOUD_NAME: Lazy<String> = Lazy::new(|| {
 pub static CLOUDINARY_API_BASE_URL: Lazy<String> = Lazy::new(|| {
     env::var("CLOUDINARY_API_BASE_URL").expect("CLOUDINARY_API_BASE_URL must be set")
 }); 
+
+pub static  REDIS_URL: Lazy<String> = Lazy::new(|| {
+    env::var("REDIS_URL").expect("REDIS_URL must be set")
+});

@@ -11,6 +11,7 @@ mod utils;
 mod library;
 
 use crate::routes::get_routes;
+use crate::library::base_lib_key::REDIS_URL;
 use dotenvy::dotenv;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use std::env;
@@ -22,6 +23,8 @@ fn rocket() -> _ {
     let port = env::var("PORT").unwrap_or_else(|_| "8000".to_string());
     let port: u16 = port.parse().expect("PORT harus berupa angka");
     let address = env::var("ADDRESS").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let redis_client = redis::Client::open(REDIS_URL.to_string())
+        .expect("failed to create Redis client");
 
     let environment = env::var("ENV_ENVIRONMENT").unwrap_or_else(|_| "PRODUCTION".to_string());
 
@@ -46,6 +49,7 @@ fn rocket() -> _ {
             .merge(("address", address)),
     )
     .mount("/", get_routes())
+    .manage(redis_client)
     .attach(utils::db::attach_db())
     .attach(cors)
 }
