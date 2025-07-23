@@ -10,7 +10,7 @@ mod services;
 mod utils;
 mod library;
 
-use crate::routes::get_routes;
+use crate::{routes::get_routes, utils::rate_limiter::global_rate_limiter::GlobalRateLimiter};
 use crate::library::base_lib_key::REDIS_URL;
 use dotenvy::dotenv;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
@@ -52,4 +52,5 @@ fn rocket() -> _ {
     .manage(redis_client)
     .attach(utils::db::attach_db())
     .attach(cors)
+    .attach(GlobalRateLimiter)
 }

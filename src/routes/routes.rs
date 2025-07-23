@@ -1,7 +1,6 @@
 use rocket::get;
-use crate::utils::rate_limiter::middleware::RateLimiter;
 
 #[get("/")]
-pub fn index(_rate_limiter: RateLimiter) -> &'static str {
+pub fn index() -> &'static str {
     "Welcome to Yumana API!"
 }

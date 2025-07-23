@@ -1,3 +1,5 @@
+//change to global rate limiter instead for specific endpoint
+
 use std::{env, net::IpAddr};
 use redis::Commands;
 use rocket::{
