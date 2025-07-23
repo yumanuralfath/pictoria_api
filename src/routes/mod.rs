@@ -19,6 +19,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         users_routes::me,
         users_routes::delete_user,
         users_routes::get_username_by_id,
+        users_routes::ip_ban,
         threads_routes::get_threads,
         threads_routes::create_thread,
         threads_routes::update_thread,

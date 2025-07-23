@@ -53,3 +53,9 @@ pub struct UpdatedUser {
     pub password: Option<String>,
     pub profile_picture_url: Option<String>,
 }
+
+#[derive(Deserialize)]
+pub struct IpBan{
+    pub ip: String,
+    pub reason: String
+}

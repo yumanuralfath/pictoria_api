@@ -1,12 +1,16 @@
+use std::net::IpAddr;
+
 use crate::controllers::users_controllers::UserController;
-use crate::models::users::{EditUser, LoginCredentials, NewUser, UpdatedUser};
+use crate::models::users::{EditUser, IpBan, LoginCredentials, NewUser, UpdatedUser};
 use crate::output::user_output::{
     CreateUserResponse, LoginResponse, PaginatedUserResponse, UserOutput,
 };
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
 use crate::utils::pagination::paginate;
+use crate::utils::rate_limiter::ip_ban::send_block_webhook;
 use rocket::http::Status;
+use rocket::response::status;
 use rocket::serde::json::Json;
 use rocket::State;
 use serde_json::json;
@@ -156,4 +160,29 @@ pub async fn get_username_by_id(
     Ok(Json(json!({
         "username": username
     })))
+}
+
+#[post("/ipBan", data = "<ip_ban_reason>")]
+pub async fn ip_ban(
+    auth: AuthenticatedUser,
+    ip_ban_reason: Json<IpBan>,
+) -> Result<status::Custom<&'static str>, status::Custom<&'static str>> {
+    if !auth.is_admin {
+        return Err(status::Custom(Status::Unauthorized, "only admin feature"))
+    }
+
+    match ip_ban_reason.ip.parse::<IpAddr>() {
+        Ok(ip_addr) => {
+            let payload = json!({
+                "ip": ip_ban_reason.ip,
+                "reason": ip_ban_reason.reason
+            });
+
+            send_block_webhook(ip_addr, Some(payload)).await;
+            Ok(status::Custom(Status::Ok, "IP block webhook sent"))
+        }
+        Err(_) => {
+            Err(status::Custom(Status::BadRequest, "Invalid IP address"))
+        }
+    }
 }

@@ -16,7 +16,6 @@ pub fn create_chat(
 ) -> Result<Json<CreateChatResponse>, (Status, Json<Value>)> {
     let chat_controller = ChatController::new(pool.inner());
 
-    println!("receiver_id: {}", receiver_id);
     match chat_controller.create_chat(auth, chat.into_inner(), receiver_id) {
         Ok(chat) => {
             let response = CreateChatResponse::new(true, chat.message);

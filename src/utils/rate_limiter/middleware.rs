@@ -1,10 +1,10 @@
 use std::{env, net::IpAddr};
 use redis::Commands;
 use rocket::{
-    http::Status,
-    request::{FromRequest, Outcome},
-    Request,
+    http::Status, request::{FromRequest, Outcome}, tokio, Request
 };
+
+use crate::utils::rate_limiter::ip_ban::send_block_webhook;
 
 pub struct RateLimiter;
 
@@ -39,8 +39,10 @@ impl<'r> FromRequest<'r> for RateLimiter {
         let _: () = con.expire(&key, 60).unwrap_or(());
 
         if count > 100 {
-            // TODO: Add ip ban function
             println!("ABUSE DETECTED: {}", client_ip);
+            tokio::spawn(async move {
+                send_block_webhook(client_ip, None).await;
+            });
             return Outcome::Forward(Status::TooManyRequests);
         }
 
