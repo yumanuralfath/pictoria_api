@@ -3,6 +3,7 @@ use std::env;
 use redis::Commands;
 use rocket::tokio;
 use crate::utils::rate_limiter::ip_ban::send_block_webhook;
+use crate::utils::rate_limiter::get_real_ip::get_real_ip;
 
 pub struct GlobalRateLimiter;
 
@@ -21,32 +22,26 @@ impl Fairing for GlobalRateLimiter {
             return;
         }
 
-        let client_ip = match request.client_ip() {
+        let client_ip = match get_real_ip(request) {
             Some(ip) => ip,
             None => return,
         };
 
-        let redis_client = match request.rocket().state::<redis::Client>() {
-            Some(client) => client,
-            None => return,
-        };
+        if let Some(redis_client) = request.rocket().state::<redis::Client>() {
+            if let Ok(mut con) = redis_client.get_connection() {
+                let key = format!("rate_limit:{}", client_ip);
+                let count: i32 = con.incr(&key, 1).unwrap_or(0);
+                let _: () = con.expire(&key, 60).unwrap_or(());
 
-        let mut con = match redis_client.get_connection() {
-            Ok(c) => c,
-            Err(_) => return,
-        };
+                if count > 100 {
+                    println!("ABUSE DETECTED: {}", client_ip);
+                    tokio::spawn(async move {
+                        send_block_webhook(client_ip, None).await;
+                    });
 
-        let key = format!("rate_limit:{}", client_ip);
-        let count: i32 = con.incr(&key, 1).unwrap_or(0);
-        let _: () = con.expire(&key, 60).unwrap_or(());
-
-        if count > 100 {
-            println!("ABUSE DETECTED: {}", client_ip);
-            tokio::spawn(async move {
-                send_block_webhook(client_ip, None).await;
-            });
-
-            request.local_cache(|| true);
+                    request.local_cache(|| true);
+                }
+            }
         }
     }
 
