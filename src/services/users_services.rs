@@ -22,13 +22,13 @@ impl<'a> UserService<'a> {
         self.pool.get().expect("Failed to get DB connection")
     }
 
-    fn with_connection<F, R>(&self, f: F) -> R  
-    where 
+    fn with_connection<F, R>(&self, f: F) -> R
+    where
         F: FnOnce(&mut PgConnection) -> R,
-        {
-            let mut conn = self.get_connection();
-            f(&mut conn)
-        }
+    {
+        let mut conn = self.get_connection();
+        f(&mut conn)
+    }
 
     fn is_valid_email(new_email: &str) -> Result<(), String> {
         let regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
@@ -40,13 +40,11 @@ impl<'a> UserService<'a> {
     }
 
     fn email_already_exist(&self, new_email: &str) -> Result<(), String> {
-
-        self.with_connection(|conn|{
+        self.with_connection(|conn| {
             match users
-            .filter(email.eq(new_email))
-            .select(User::as_select())
-            .first::<User>(conn)
-
+                .filter(email.eq(new_email))
+                .select(User::as_select())
+                .first::<User>(conn)
             {
                 Ok(_) => Err("Email already exists".to_string()),
                 Err(diesel::result::Error::NotFound) => Ok(()),
@@ -55,14 +53,14 @@ impl<'a> UserService<'a> {
         })
     }
 
-    fn get_users(&self, offset: i64, limit: i64) -> Vec<User> {        
-        self.with_connection(|conn|{
+    fn get_users(&self, offset: i64, limit: i64) -> Vec<User> {
+        self.with_connection(|conn| {
             users
-            .limit(limit)
-            .offset(offset)
-            .select(User::as_select())
-            .load::<User>(conn)
-            .expect("Error loading users")
+                .limit(limit)
+                .offset(offset)
+                .select(User::as_select())
+                .load::<User>(conn)
+                .expect("Error loading users")
         })
     }
 
@@ -92,13 +90,13 @@ impl<'a> UserService<'a> {
     }
 
     pub fn get_user(&self, user_id: i32, _auth_user: &AuthenticatedUser) -> Option<UserOutput> {
-        self.with_connection(|conn|{
+        self.with_connection(|conn| {
             users
-            .find(user_id)
-            .select(User::as_select())
-            .first::<User>(conn)
-            .ok()
-            .map(UserOutput::from_user)
+                .find(user_id)
+                .select(User::as_select())
+                .first::<User>(conn)
+                .ok()
+                .map(UserOutput::from_user)
         })
     }
 
@@ -112,19 +110,19 @@ impl<'a> UserService<'a> {
         Self::is_valid_email(&new_user.email)?;
 
         new_user.password = hash_password(&new_user.password);
-        
-        if new_user.profile_picture_url.is_none() {
-            new_user.profile_picture_url = Some("https://yumana.my.id/default-avatar.png".to_string());
-        }
-        
-        self.with_connection(|conn|{
-            diesel::insert_into(users)
-            .values(new_user)
-            .returning(User::as_returning())
-            .get_result(conn)
-            .map_err(|e| format!("Error creating user: {}", e))
-        })
 
+        if new_user.profile_picture_url.is_none() {
+            new_user.profile_picture_url =
+                Some("https://yumana.my.id/default-avatar.png".to_string());
+        }
+
+        self.with_connection(|conn| {
+            diesel::insert_into(users)
+                .values(new_user)
+                .returning(User::as_returning())
+                .get_result(conn)
+                .map_err(|e| format!("Error creating user: {}", e))
+        })
     }
 
     pub fn login(&self, credentials: LoginCredentials) -> Option<LoginResponse> {
@@ -152,21 +150,9 @@ impl<'a> UserService<'a> {
         }
     }
 
-    // Maybe next time bro
-    // pub fn is_admin_user(
-    //     &self,
-    //     auth_user: &AuthenticatedUser
-    // ) -> Result<(), String> {
-    //     if !auth_user.is_admin {
-    //         return Err("Unauthorized: Only admins can use this feature.".to_string());
-    //     }
-    //     Ok(())
-    // }
+    
 
-    pub fn is_active_user(
-        &self,
-        auth_user: &AuthenticatedUser
-    ) -> Result<(), String> {
+    pub fn is_active_user(&self, auth_user: &AuthenticatedUser) -> Result<(), String> {
         if auth_user.user_id.is_negative() {
             return Err("Unauthorized: Only User can use this feature.".to_string());
         }

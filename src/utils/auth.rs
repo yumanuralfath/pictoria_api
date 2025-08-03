@@ -19,6 +19,16 @@ pub struct AuthenticatedUser {
     pub is_admin: bool,
 }
 
+//wkwkkw pindah kesini
+impl AuthenticatedUser {
+    pub fn is_admin_user(&self) -> Result<(), String> {
+        if !self.is_admin {
+            return Err("Unauthorized: Only admins can use this feature.".to_string());
+        }
+        Ok(())
+    }
+}
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AuthenticatedUser {
     type Error = ();

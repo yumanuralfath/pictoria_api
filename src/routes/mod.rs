@@ -1,11 +1,12 @@
 pub mod chats_routes;
+pub mod cloudinary_routes;
 pub mod comment_routes;
+pub mod log_books_routes;
+pub mod openai_routes;
 pub mod routes;
 pub mod threads_routes;
 pub mod users_routes;
 pub mod voices_routes;
-pub mod openai_routes;
-pub mod cloudinary_routes;
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![
@@ -38,6 +39,11 @@ pub fn get_routes() -> Vec<rocket::Route> {
         voices_routes::weekly_resume,
         voices_routes::monthly_resume,
         voices_routes::get_active_voice_month,
-        cloudinary_routes::upload_profile_pic
+        cloudinary_routes::upload_profile_pic,
+        log_books_routes::create_log_book,
+        log_books_routes::get_log_books,
+        log_books_routes::get_log_book_by_id,
+        log_books_routes::update_log_book,
+        log_books_routes::delete_log_book
     ]
 }

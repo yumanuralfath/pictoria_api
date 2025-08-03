@@ -23,6 +23,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    log_books (id) {
+        id -> Int4,
+        date -> Date,
+        content -> Text,
+        user_id -> Int4,
+    }
+}
+
+diesel::table! {
     threads (id) {
         id -> Int4,
         content -> Text,
@@ -95,6 +104,7 @@ diesel::table! {
 
 diesel::joinable!(comments -> threads (thread_id));
 diesel::joinable!(comments -> users (user_id));
+diesel::joinable!(log_books -> users (user_id));
 diesel::joinable!(threads -> users (user_id));
 diesel::joinable!(voices -> users (user_id));
 diesel::joinable!(voices_months -> users (user_id));
@@ -107,6 +117,7 @@ diesel::joinable!(voices_weeks_voices -> voices_weeks (voices_week_id));
 diesel::allow_tables_to_appear_in_same_query!(
     chats,
     comments,
+    log_books,
     threads,
     users,
     voices,

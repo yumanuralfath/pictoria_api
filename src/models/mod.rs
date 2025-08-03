@@ -1,6 +1,7 @@
-pub mod users;
-pub mod threads;
-pub mod comments;
 pub mod chats;
-pub mod voices;
 pub mod cloudinary;
+pub mod comments;
+pub mod log_books;
+pub mod threads;
+pub mod users;
+pub mod voices;
