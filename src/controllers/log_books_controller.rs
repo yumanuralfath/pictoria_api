@@ -1,5 +1,6 @@
 use crate::{
     models::log_books::{LogBook, NewLogBook, UpdateLogBook},
+    output::log_book_output::PaginatedLogBookResponse,
     services::log_books_service::LogBookService,
     utils::{auth::AuthenticatedUser, db::DbPool},
 };
@@ -23,11 +24,22 @@ impl<'a> LogBookController<'a> {
         self.service.create_log_book(user, new_log_book)
     }
 
-    pub fn get_log_books(&self, user: AuthenticatedUser) -> Result<Vec<LogBook>, String> {
-        self.service.get_log_books(user)
+    pub fn get_paginated_log_books(
+        &self,
+        user: AuthenticatedUser,
+        limit: i64,
+        offset: i64,
+        page: u32,
+    ) -> PaginatedLogBookResponse {
+        self.service
+            .get_paginated_log_books(user, offset, limit, page)
     }
 
-    pub fn get_log_book_by_id(&self, user: AuthenticatedUser, log_id: i32) -> Result<LogBook, String> {
+    pub fn get_log_book_by_id(
+        &self,
+        user: AuthenticatedUser,
+        log_id: i32,
+    ) -> Result<LogBook, String> {
         self.service.get_log_book_by_id(user, log_id)
     }
 

@@ -17,7 +17,9 @@ pub struct LogBook {
 #[diesel(table_name = log_books)]
 pub struct NewLogBook {
     pub content: String,
+    #[serde(skip_deserializing)]
     pub date: NaiveDate,
+    #[serde(skip_deserializing)]
     pub user_id: i32,
 }
 

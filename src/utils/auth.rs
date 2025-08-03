@@ -13,7 +13,7 @@ pub struct Claims {
     pub is_admin: bool,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct AuthenticatedUser {
     pub user_id: i32,
     pub is_admin: bool,
