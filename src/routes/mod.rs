@@ -2,6 +2,7 @@ pub mod chats_routes;
 pub mod cloudinary_routes;
 pub mod comment_routes;
 pub mod log_books_routes;
+pub mod lol_routes;
 pub mod openai_routes;
 pub mod routes;
 pub mod threads_routes;
@@ -44,6 +45,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         log_books_routes::get_log_books,
         log_books_routes::get_log_book_by_id,
         log_books_routes::update_log_book,
-        log_books_routes::delete_log_book
+        log_books_routes::delete_log_book,
+        lol_routes::lol_route
     ]
 }

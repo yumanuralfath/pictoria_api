@@ -5,3 +5,4 @@ pub mod comment_output;
 pub mod chat_output;
 pub mod voice_output;
 pub mod log_book_output;
+pub mod root_output;
