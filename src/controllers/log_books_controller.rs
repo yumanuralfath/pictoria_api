@@ -26,21 +26,15 @@ impl<'a> LogBookController<'a> {
 
     pub fn get_paginated_log_books(
         &self,
-        user: AuthenticatedUser,
         limit: i64,
         offset: i64,
         page: u32,
     ) -> PaginatedLogBookResponse {
-        self.service
-            .get_paginated_log_books(user, offset, limit, page)
+        self.service.get_paginated_log_books(offset, limit, page)
     }
 
-    pub fn get_log_book_by_id(
-        &self,
-        user: AuthenticatedUser,
-        log_id: i32,
-    ) -> Result<LogBook, String> {
-        self.service.get_log_book_by_id(user, log_id)
+    pub fn get_log_book_by_id(&self, log_id: i32) -> Result<LogBook, String> {
+        self.service.get_log_book_by_id(log_id)
     }
 
     pub fn update_log_book(

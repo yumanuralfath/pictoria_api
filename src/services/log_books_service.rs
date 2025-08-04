@@ -7,12 +7,12 @@ use crate::{
     schema::log_books::{self, dsl::*},
     utils::{auth::AuthenticatedUser, db::DbPool},
 };
+use chrono::Local;
 use diesel::prelude::*;
 use diesel::{
     r2d2::{ConnectionManager, PooledConnection},
     PgConnection, RunQueryDsl,
 };
-use chrono::Local;
 
 pub struct LogBookService<'a> {
     pool: &'a DbPool,
@@ -44,18 +44,9 @@ impl<'a> LogBookService<'a> {
             .map_err(|e| e.to_string())
     }
 
-    pub fn get_log_books_by_user(
-        &self,
-        user: AuthenticatedUser,
-        offset: i64,
-        limit: i64,
-    ) -> Result<Vec<LogBook>, String> {
+    pub fn get_log_books_by_user(&self, offset: i64, limit: i64) -> Result<Vec<LogBook>, String> {
         let mut conn = self.get_connection();
-        let mut query = log_books.into_boxed();
-
-        if !user.is_admin {
-            query = query.filter(user_id.eq(user.user_id));
-        }
+        let query = log_books.into_boxed();
 
         query
             .limit(limit)
@@ -64,26 +55,21 @@ impl<'a> LogBookService<'a> {
             .map_err(|e| e.to_string())
     }
 
-    pub fn count_log_books(&self, user: AuthenticatedUser) -> i64 {
+    pub fn count_log_books(&self) -> i64 {
         let mut conn = self.get_connection();
-        let mut query = log_books.into_boxed();
-
-        if !user.is_admin {
-            query = query.filter(user_id.eq(user.user_id));
-        }
+        let query = log_books.into_boxed();
 
         query.count().get_result(&mut conn).unwrap_or(0)
     }
 
     pub fn get_paginated_log_books(
         &self,
-        user: AuthenticatedUser,
         offset: i64,
         limit: i64,
         page: u32,
     ) -> PaginatedLogBookResponse {
         let log_book_list = self
-            .get_log_books_by_user(user.clone(), offset, limit)
+            .get_log_books_by_user(offset, limit)
             .unwrap_or_default();
 
         let modified_result = log_book_list
@@ -96,24 +82,16 @@ impl<'a> LogBookService<'a> {
             pagination: PaginationInfo {
                 current_page: page,
                 limit: limit as u32,
-                total_items: self.count_log_books(user),
+                total_items: self.count_log_books(),
             },
         }
     }
 
-    pub fn get_log_book_by_id(
-        &self,
-        user: AuthenticatedUser,
-        log_id: i32,
-    ) -> Result<LogBook, String> {
+    pub fn get_log_book_by_id(&self, log_id: i32) -> Result<LogBook, String> {
         let mut conn = self.get_connection();
         let mut query = log_books.into_boxed();
 
-        if !user.is_admin {
-            query = query.filter(user_id.eq(user.user_id).and(id.eq(log_id)));
-        } else {
-            query = query.filter(id.eq(log_id));
-        }
+        query = query.filter(id.eq(log_id));
 
         query.first::<LogBook>(&mut conn).map_err(|e| e.to_string())
     }
