@@ -48,7 +48,7 @@ impl<'a> UserService<'a> {
             {
                 Ok(_) => Err("Email already exists".to_string()),
                 Err(diesel::result::Error::NotFound) => Ok(()),
-                Err(err) => Err(format!("Database error: {}", err)),
+                Err(err) => Err(format!("Database error: {err}")),
             }
         })
     }
@@ -106,7 +106,7 @@ impl<'a> UserService<'a> {
             return Err("Username, email, and password are required.".to_string());
         }
 
-        Self::email_already_exist(&self, &new_user.email)?;
+        Self::email_already_exist(self, &new_user.email)?;
         Self::is_valid_email(&new_user.email)?;
 
         new_user.password = hash_password(&new_user.password);
@@ -121,7 +121,7 @@ impl<'a> UserService<'a> {
                 .values(new_user)
                 .returning(User::as_returning())
                 .get_result(conn)
-                .map_err(|e| format!("Error creating user: {}", e))
+                .map_err(|e| format!("Error creating user: {e}"))
         })
     }
 
@@ -149,8 +149,6 @@ impl<'a> UserService<'a> {
             None
         }
     }
-
-    
 
     pub fn is_active_user(&self, auth_user: &AuthenticatedUser) -> Result<(), String> {
         if auth_user.user_id.is_negative() {
@@ -183,7 +181,7 @@ impl<'a> UserService<'a> {
             .set(user)
             .returning(User::as_returning())
             .get_result(&mut conn)
-            .map_err(|e| format!("Error editing user: {}", e))
+            .map_err(|e| format!("Error editing user: {e}"))
     }
 
     pub fn update_user(&self, user_id: i32, mut user: UpdatedUser) -> Result<User, String> {
@@ -201,7 +199,7 @@ impl<'a> UserService<'a> {
             .set(user)
             .returning(User::as_returning())
             .get_result(&mut conn)
-            .map_err(|e| format!("Error updating user: {}", e))
+            .map_err(|e| format!("Error updating user: {e}"))
     }
 
     pub fn delete_user(&self, user_id: i32, auth_user: &AuthenticatedUser) -> Result<(), String> {
@@ -212,7 +210,7 @@ impl<'a> UserService<'a> {
         let mut conn = self.get_connection();
         diesel::delete(users.find(user_id))
             .execute(&mut conn)
-            .map_err(|e| format!("Error deleting user: {}", e))
+            .map_err(|e| format!("Error deleting user: {e}"))
             .map(|_| ())
     }
 

@@ -34,10 +34,10 @@ impl<'a> CommentService<'a> {
             .select(thread_id)
             .first::<i32>(&mut conn)
             .optional()
-            .map_err(|e| format!("Error checking thread existence: {}", e))?;
+            .map_err(|e| format!("Error checking thread existence: {e}"))?;
 
         if thread_exists.is_none() {
-            return Err(format!("Thread with ID {} does not exist", thread_id_param));
+            return Err(format!("Thread with ID {thread_id_param} does not exist"));
         }
         new_comment.thread_id = Some(thread_id_param);
 
@@ -49,7 +49,7 @@ impl<'a> CommentService<'a> {
             .values(new_comment)
             .returning(Comment::as_returning())
             .get_result(&mut conn)
-            .map_err(|e| format!("Error creating comment: {}", e))
+            .map_err(|e| format!("Error creating comment: {e}"))
     }
 
     pub fn get_comments_by_thread_id(
@@ -85,7 +85,7 @@ impl<'a> CommentService<'a> {
         thread_id_param: i32,
         offset: i64,
         limit: i64,
-        page: u32
+        page: u32,
     ) -> PaginatedCommentResponse {
         let comment_list = self.get_comments_by_thread_id(thread_id_param, offset, limit);
 
@@ -133,7 +133,7 @@ impl<'a> CommentService<'a> {
             .set(update_comment)
             .returning(Comment::as_returning())
             .get_result(&mut conn)
-            .map_err(|e| format!("Error updating comment: {}", e))
+            .map_err(|e| format!("Error updating comment: {e}"))
     }
 
     pub fn delete_comment(
@@ -153,7 +153,7 @@ impl<'a> CommentService<'a> {
 
         diesel::delete(comments.find(comment_id))
             .execute(&mut conn)
-            .map_err(|e| format!("Error deleting comment: {}", e))
+            .map_err(|e| format!("Error deleting comment: {e}"))
             .map(|_| ())
     }
 }

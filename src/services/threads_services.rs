@@ -36,7 +36,7 @@ impl<'a> ThreadService<'a> {
             .values(new_thread)
             .returning(Thread::as_returning())
             .get_result(&mut conn)
-            .map_err(|e| format!("Error creating thread: {}", e))
+            .map_err(|e| format!("Error creating thread: {e}"))
     }
 
     //uwu ini yang tidak di pakai
@@ -71,13 +71,16 @@ impl<'a> ThreadService<'a> {
             .filter(id.eq_any(&random_ids))
             .load::<Thread>(&mut conn)
             .unwrap_or_default();
-    
+
         // Urutkan hasil sesuai urutan random_ids
         threads_result.sort_by_key(|thread| {
-            random_ids.iter().position(|&r_id| r_id == thread.id).unwrap_or(usize::MAX)
-    });
-    
-    threads_result
+            random_ids
+                .iter()
+                .position(|&r_id| r_id == thread.id)
+                .unwrap_or(usize::MAX)
+        });
+
+        threads_result
     }
 
     pub fn count_threads(&self) -> i64 {
@@ -137,7 +140,7 @@ impl<'a> ThreadService<'a> {
             .set(update_thread)
             .returning(Thread::as_returning())
             .get_result(&mut conn)
-            .map_err(|e| format!("Error updating thread: {}", e))
+            .map_err(|e| format!("Error updating thread: {e}",))
     }
 
     pub fn delete_thread(
@@ -157,7 +160,7 @@ impl<'a> ThreadService<'a> {
 
         diesel::delete(threads.find(thread_id))
             .execute(&mut conn)
-            .map_err(|e| format!("Error deleting thread: {}", e))
+            .map_err(|e| format!("Error deleting thread: {e}"))
             .map(|_| ())
     }
 }

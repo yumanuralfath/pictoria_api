@@ -1,17 +1,20 @@
 use crate::library::deepseek_ai::deepseek_chat;
-use crate::models::voices::{NewVoiceLog, NewVoicesWeeks, NewVoicesWeeksVoices, UpdateVoices, Voice, VoicesWeeks, NewVoicesMonths, VoicesMonths, NewVoicesMonthsVoices};
+use crate::models::voices::{
+    NewVoiceLog, NewVoicesMonths, NewVoicesMonthsVoices, NewVoicesWeeks, NewVoicesWeeksVoices,
+    UpdateVoices, Voice, VoicesMonths, VoicesWeeks,
+};
 use crate::schema::voices::dsl as voices_dsl;
-use crate::schema::voices::table as voices; 
-use crate::schema::voices_weeks::dsl as weeks_dsl;
-use crate::schema::voices_weeks::table as voices_weeks;
-use crate::schema::voices_weeks_voices::dsl::voices_weeks_voices;
+use crate::schema::voices::table as voices;
 use crate::schema::voices_months::dsl as months_dsl;
 use crate::schema::voices_months::table as voices_months;
 use crate::schema::voices_months_voices::dsl::voices_months_voices;
+use crate::schema::voices_weeks::dsl as weeks_dsl;
+use crate::schema::voices_weeks::table as voices_weeks;
+use crate::schema::voices_weeks_voices::dsl::voices_weeks_voices;
 use crate::utils::auth::AuthenticatedUser;
 use crate::utils::db::DbPool;
 use crate::utils::time_converter::{get_monthly_date, get_today_date, get_weekly_date};
-use chrono::{DateTime, Utc, NaiveDate}; 
+use chrono::{DateTime, NaiveDate, Utc};
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
 use serde_json::Value;
@@ -31,16 +34,22 @@ impl<'a> VoiceServices<'a> {
 
     fn get_today_voice(&self, auth_user: &AuthenticatedUser) -> Result<Option<Voice>, String> {
         let mut conn = self.get_connection();
-    
+
         let date_now = get_today_date();
-    
+
         voices
             .filter(voices_dsl::user_id.eq(auth_user.user_id))
             .filter(voices_dsl::created_at.ge(date_now.and_hms_opt(0, 0, 0).unwrap()))
-            .filter(voices_dsl::created_at.lt(date_now.succ_opt().unwrap().and_hms_opt(0, 0, 0).unwrap()))
+            .filter(
+                voices_dsl::created_at.lt(date_now
+                    .succ_opt()
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap()),
+            )
             .first::<Voice>(&mut conn)
             .optional()
-            .map_err(|err| format!("DB error: {}", err))
+            .map_err(|err| format!("DB error: {err}"))
     }
 
     fn get_voice_log_by_id(&self, voice_log_id: i32) -> Option<Voice> {
@@ -53,35 +62,42 @@ impl<'a> VoiceServices<'a> {
             .ok()
     }
 
-    fn get_owned_voice_log(&self, voice_log_id: i32, auth_user: &AuthenticatedUser) -> Result<Voice, String> {
+    fn get_owned_voice_log(
+        &self,
+        voice_log_id: i32,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<Voice, String> {
         let voice_log = self
             .get_voice_log_by_id(voice_log_id)
             .ok_or_else(|| "Voice log not found".to_string())?;
 
         if voice_log.user_id != auth_user.user_id {
             return Err("Unauthorized access to this voice log".to_string());
-    }
+        }
         Ok(voice_log)
     }
 
-    
-    fn get_weekly_voice_log(&self, auth_user: &AuthenticatedUser, date: NaiveDate) -> Result<Vec<Voice>, String> {
+    fn get_weekly_voice_log(
+        &self,
+        auth_user: &AuthenticatedUser,
+        date: NaiveDate,
+    ) -> Result<Vec<Voice>, String> {
         let mut conn = self.get_connection();
-        
+
         let weekly_dates = get_weekly_date(date);
-        
+
         let weekly_date_min = weekly_dates.iter().min().unwrap();
         let weekly_date_max = weekly_dates.iter().max().unwrap();
-        
+
         let response = voices
-        .filter(voices_dsl::user_id.eq(auth_user.user_id)) 
-        .filter(voices_dsl::created_at.between(weekly_date_min, weekly_date_max)) 
-        .order(voices_dsl::created_at.desc())
-        .load::<Voice>(&mut conn)
-        .map_err(|err| format!("Database error: {}", err));
-    
-    response
-    }  
+            .filter(voices_dsl::user_id.eq(auth_user.user_id))
+            .filter(voices_dsl::created_at.between(weekly_date_min, weekly_date_max))
+            .order(voices_dsl::created_at.desc())
+            .load::<Voice>(&mut conn)
+            .map_err(|err| format!("Database error: {err}"));
+
+        response
+    }
 
     fn get_weekly_voice_today(&self) -> Result<Option<VoicesWeeks>, String> {
         let mut conn = self.get_connection();
@@ -89,15 +105,19 @@ impl<'a> VoiceServices<'a> {
 
         voices_weeks
             .filter(weeks_dsl::created_at.ge(today.and_hms_opt(0, 0, 0).unwrap()))
-            .filter(weeks_dsl::created_at.lt(today.succ_opt().unwrap().and_hms_opt(0, 0, 0).unwrap()))
+            .filter(
+                weeks_dsl::created_at.lt(today.succ_opt().unwrap().and_hms_opt(0, 0, 0).unwrap()),
+            )
             .first::<VoicesWeeks>(&mut conn)
             .optional()
-            .map_err(|err| format!("DB error: {}", err))
-        
+            .map_err(|err| format!("DB error: {err}"))
     }
 
-
-    fn get_monthly_voice_log(&self, auth_user: &AuthenticatedUser, date: NaiveDate) -> Result<Vec<Voice>, String> {
+    fn get_monthly_voice_log(
+        &self,
+        auth_user: &AuthenticatedUser,
+        date: NaiveDate,
+    ) -> Result<Vec<Voice>, String> {
         let mut conn = self.get_connection();
 
         let monthly_dates = get_monthly_date(date);
@@ -110,7 +130,7 @@ impl<'a> VoiceServices<'a> {
             .filter(voices_dsl::created_at.between(monthly_date_min, monthly_date_max))
             .order(voices_dsl::created_at.desc())
             .load::<Voice>(&mut conn)
-            .map_err(|err| format!("Database error: {}", err));
+            .map_err(|err| format!("Database error: {err}"));
 
         response
     }
@@ -121,10 +141,12 @@ impl<'a> VoiceServices<'a> {
 
         voices_months
             .filter(months_dsl::created_at.ge(today.and_hms_opt(0, 0, 0).unwrap()))
-            .filter(months_dsl::created_at.lt(today.succ_opt().unwrap().and_hms_opt(0, 0, 0).unwrap()))
+            .filter(
+                months_dsl::created_at.lt(today.succ_opt().unwrap().and_hms_opt(0, 0, 0).unwrap()),
+            )
             .first::<VoicesMonths>(&mut conn)
             .optional()
-            .map_err(|err| format!("DB Error: {}", err))
+            .map_err(|err| format!("DB Error: {err}"))
     }
 
     pub fn get_active_dates_in_month(
@@ -147,30 +169,38 @@ impl<'a> VoiceServices<'a> {
             .select(sql::<Date>("date(created_at)")) // SQL: convert timestamp -> date
             .distinct()
             .load::<NaiveDate>(&mut conn)
-            .map_err(|err| format!("Database error: {}", err))?;
+            .map_err(|err| format!("Database error: {err}"))?;
 
         Ok(results)
     }
 
-    pub fn create_voice_log(&self, new_voice_log: NewVoiceLog, auth_user: &AuthenticatedUser) -> Result<Voice, String> {
+    pub fn create_voice_log(
+        &self,
+        new_voice_log: NewVoiceLog,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<Voice, String> {
         let mut conn = self.get_connection();
 
         if let Some(existing_voice) = self.get_today_voice(auth_user)? {
             return Err(format!(
                 "Voice log already exists for today: ({}) {}, Please update or delete voice log",
-                existing_voice.id,
-                existing_voice.voices_journal
+                existing_voice.id, existing_voice.voices_journal
             ));
         }
-    
+
         diesel::insert_into(voices)
             .values(&new_voice_log)
             .returning(Voice::as_select())
             .get_result::<Voice>(&mut conn)
-            .map_err(|e| format!("error creating voice log: {}", e))
+            .map_err(|e| format!("error creating voice log: {e}"))
     }
 
-    pub fn update_voice_log(&self, voice_log_id: i32, update_voice_log:UpdateVoices, auth_user: &AuthenticatedUser) -> Result<Voice, String>{
+    pub fn update_voice_log(
+        &self,
+        voice_log_id: i32,
+        update_voice_log: UpdateVoices,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<Voice, String> {
         let mut conn = self.get_connection();
 
         let _ = self.get_owned_voice_log(voice_log_id, auth_user)?;
@@ -179,44 +209,55 @@ impl<'a> VoiceServices<'a> {
             .set(update_voice_log)
             .returning(Voice::as_returning())
             .get_result(&mut conn)
-            .map_err(|e| format!("Error updating voice: {}", e))
-
+            .map_err(|e| format!("Error updating voice: {e}"))
     }
 
-    pub fn delete_voice_log(&self, voice_log_id: i32, auth_user: &AuthenticatedUser) -> Result<(), String> {
+    pub fn delete_voice_log(
+        &self,
+        voice_log_id: i32,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<(), String> {
         let mut conn = self.get_connection();
 
         let _ = self.get_owned_voice_log(voice_log_id, auth_user)?;
-        
+
         diesel::delete(voices.find(voice_log_id))
             .execute(&mut conn)
-            .map_err(|e| format!("Error deleting thread: {}", e))
+            .map_err(|e| format!("Error deleting thread: {e}"))
             .map(|_| ())
     }
 
-    pub fn get_voice_log_by_date(&self, auth_user: AuthenticatedUser, date: NaiveDate) -> Result<Option<Voice>, String> {
+    pub fn get_voice_log_by_date(
+        &self,
+        auth_user: AuthenticatedUser,
+        date: NaiveDate,
+    ) -> Result<Option<Voice>, String> {
         let mut conn = self.get_connection();
 
         let start_of_the_day = date.and_hms_opt(0, 0, 0).expect("invalid start of the day");
-        let next_day_start = date.succ_opt()
-                                                        .expect("Invalid next day start")
-                                                        .and_hms_opt(0, 0, 0);
+        let next_day_start = date
+            .succ_opt()
+            .expect("Invalid next day start")
+            .and_hms_opt(0, 0, 0);
 
         voices
-        .filter(voices_dsl::user_id.eq(auth_user.user_id))
-        .filter(voices_dsl::created_at.ge(start_of_the_day))
-        .filter(voices_dsl::created_at.lt(next_day_start))
-        .first::<Voice>(&mut conn)
-        .optional()
-        .map_err(|err| format!("DB error: {}", err))
+            .filter(voices_dsl::user_id.eq(auth_user.user_id))
+            .filter(voices_dsl::created_at.ge(start_of_the_day))
+            .filter(voices_dsl::created_at.lt(next_day_start))
+            .first::<Voice>(&mut conn)
+            .optional()
+            .map_err(|err| format!("DB error: {err}"))
     }
-    
-    pub async fn get_weekly_resume_voice(&self, auth_user: &AuthenticatedUser) -> Result<VoicesWeeks, String> {
+
+    pub async fn get_weekly_resume_voice(
+        &self,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<VoicesWeeks, String> {
         let mut conn = self.get_connection();
 
         let today = get_today_date();
         let weekly_voice_log = self.get_weekly_voice_log(auth_user, today)?;
-        
+
         if weekly_voice_log.is_empty() {
             return Err("Tidak ada voice journal selama seminggu".to_string());
         }
@@ -234,19 +275,26 @@ impl<'a> VoiceServices<'a> {
                 return Err(e);
             }
         }
-        
+
         let weekly_voices_collect = weekly_voice_log
             .iter()
             .map(|y| {
-                let tanggal_str = y.created_at
+                let tanggal_str = y
+                    .created_at
                     .map(|date| {
                         let date_utc: DateTime<Utc> = date.and_utc();
 
-                        date_utc.format_localized("%A, %e %B %Y", chrono::Locale::id_ID).to_string()
+                        date_utc
+                            .format_localized("%A, %e %B %Y", chrono::Locale::id_ID)
+                            .to_string()
                     })
                     .unwrap_or_else(|| "Tanggal tidak diketahui".to_string());
 
-                format!("[Tanggal: {}]\nJurnal: {}", tanggal_str, y.voices_journal.trim())
+                format!(
+                    "[Tanggal: {}]\nJurnal: {}",
+                    tanggal_str,
+                    y.voices_journal.trim()
+                )
             })
             .collect::<Vec<_>>()
             .join("\n\n---\n\n");
@@ -273,7 +321,11 @@ impl<'a> VoiceServices<'a> {
             "#.to_string();
 
         let response = deepseek_chat(weekly_voices_collect, context_weekly).await?;
-        let voices_week_journal = response.get("content").and_then(Value::as_str).unwrap_or("").to_string();
+        let voices_week_journal = response
+            .get("content")
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .to_string();
 
         let now = Utc::now().naive_utc();
 
@@ -300,17 +352,20 @@ impl<'a> VoiceServices<'a> {
         diesel::insert_into(voices_weeks_voices)
             .values(&pivot_data)
             .execute(&mut conn)
-            .map_err(|e| format!("Insert pivot voices_weeks_voices failed: {}", e))?;
+            .map_err(|e| format!("Insert pivot voices_weeks_voices failed: {e}"))?;
 
         Ok(inserted)
     }
 
-    pub async fn get_monthly_resume_voice(&self, auth_user: &AuthenticatedUser) -> Result<VoicesMonths, String> {
+    pub async fn get_monthly_resume_voice(
+        &self,
+        auth_user: &AuthenticatedUser,
+    ) -> Result<VoicesMonths, String> {
         let mut conn = self.get_connection();
 
         let today = get_today_date();
         let monthly_voice_log = self.get_monthly_voice_log(auth_user, today)?;
-        
+
         if monthly_voice_log.is_empty() {
             return Err("Tidak ada voice journal selama sebulan".to_string());
         }
@@ -328,18 +383,25 @@ impl<'a> VoiceServices<'a> {
                 return Err(e);
             }
         }
-        
+
         let monthly_voices_collect = monthly_voice_log
             .iter()
             .map(|y| {
-                let tanggal_str = y.created_at
+                let tanggal_str = y
+                    .created_at
                     .map(|date| {
                         let date_utc: DateTime<Utc> = date.and_utc();
-                        date_utc.format_localized("%A, %e %B %Y", chrono::Locale::id_ID).to_string()
+                        date_utc
+                            .format_localized("%A, %e %B %Y", chrono::Locale::id_ID)
+                            .to_string()
                     })
                     .unwrap_or_else(|| "Tanggal tidak diketahui".to_string());
 
-                format!("[Tanggal: {}]\nJurnal: {}", tanggal_str, y.voices_journal.trim())
+                format!(
+                    "[Tanggal: {}]\nJurnal: {}",
+                    tanggal_str,
+                    y.voices_journal.trim()
+                )
             })
             .collect::<Vec<_>>()
             .join("\n\n---\n\n");
@@ -364,10 +426,16 @@ impl<'a> VoiceServices<'a> {
             "#.to_string();
 
         let response = deepseek_chat(monthly_voices_collect, context_monthly).await?;
-        let voices_month_journal = response.get("content").and_then(Value::as_str).unwrap_or("").to_string();
+        let voices_month_journal = response
+            .get("content")
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .to_string();
 
         let now_naive = Utc::now().naive_utc();
-        let month_str = today.format_localized("%B %Y", chrono::Locale::id_ID).to_string();
+        let month_str = today
+            .format_localized("%B %Y", chrono::Locale::id_ID)
+            .to_string();
 
         let new_month_log = NewVoicesMonths {
             user_id: auth_user.user_id,
@@ -390,13 +458,12 @@ impl<'a> VoiceServices<'a> {
             })
             .collect();
 
-
         diesel::insert_into(voices_months_voices)
             .values(&pivot_data)
             .execute(&mut conn)
-            .map_err(|e| format!("Insert pivot voices_months_voices failed: {}", e))?;
+            .map_err(|e| format!("Insert pivot voices_months_voices failed: {e}"))?;
 
         Ok(inserted)
     }
-    
 }
+

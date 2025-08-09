@@ -4,14 +4,14 @@ pub mod comment_routes;
 pub mod log_books_routes;
 pub mod lol_routes;
 pub mod openai_routes;
-pub mod routes;
+pub mod route;
 pub mod threads_routes;
 pub mod users_routes;
 pub mod voices_routes;
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![
-        routes::index,
+        route::index,
         users_routes::get_users,
         users_routes::get_user,
         users_routes::create_user,

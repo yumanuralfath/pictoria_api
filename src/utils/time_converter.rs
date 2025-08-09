@@ -1,4 +1,4 @@
-use chrono::{FixedOffset, NaiveDate, NaiveDateTime, TimeZone, Duration};
+use chrono::{Duration, FixedOffset, NaiveDate, NaiveDateTime, TimeZone};
 use rocket::{http::Status, serde::json::Json};
 use serde_json::{json, Value};
 
@@ -14,39 +14,39 @@ pub fn convert_to_wib(naive_datetime: NaiveDateTime) -> String {
         .to_string()
 }
 
-
 //parse str to naivedate
 pub fn parse_param_date(date: String) -> Result<NaiveDate, (Status, Json<Value>)> {
     match NaiveDate::parse_from_str(&date, "%Y-%m-%d") {
         Ok(d) => Ok(d),
-        Err(_) => {
-            return Err((
-                Status::BadRequest,
-                Json(json!({
-                    "Status": "Error",
-                    "message": "Invalid date format. Use YYYY-MM-DD."
-                })),
-            ));
-        }
+        Err(_) => Err((
+            Status::BadRequest,
+            Json(json!({
+                "Status": "Error",
+                "message": "Invalid date format. Use YYYY-MM-DD."
+            })),
+        )),
     }
 }
 
 pub fn get_today_date() -> NaiveDate {
-    let today_date = chrono::Utc::now().naive_utc().date();
-    today_date
+    chrono::Utc::now().naive_utc().date()
 }
 
 pub fn get_weekly_date(date: NaiveDate) -> Vec<NaiveDateTime> {
-    let weekly_dates = (0..7)
-        .map(|i| date - Duration::days(i));
+    let weekly_dates = (0..7).map(|i| date - Duration::days(i));
 
-    let result = weekly_dates.into_iter().map(|d| d.and_hms_opt(0, 0, 0).unwrap()).collect();
-    result
+    weekly_dates
+        .into_iter()
+        .map(|d| d.and_hms_opt(0, 0, 0).unwrap())
+        .collect()
 }
 
 pub fn get_monthly_date(date: NaiveDate) -> Vec<NaiveDateTime> {
     let monthly_date = (0..30).map(|i| date - Duration::days(i));
-    let result = monthly_date.into_iter().map(|d| d.and_hms_opt(0, 0, 0).unwrap()).collect();
 
-    result
+    monthly_date
+        .into_iter()
+        .map(|d| d.and_hms_opt(0, 0, 0).unwrap())
+        .collect()
 }
+
