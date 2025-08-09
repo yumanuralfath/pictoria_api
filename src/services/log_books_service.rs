@@ -46,13 +46,14 @@ impl<'a> LogBookService<'a> {
 
     pub fn get_log_books_by_user(&self, offset: i64, limit: i64) -> Result<Vec<LogBook>, String> {
         let mut conn = self.get_connection();
-        let query = log_books.into_boxed();
 
-        query
+        let query = log_books
+            .into_boxed()
+            .order((date.asc(), id.asc()))
             .limit(limit)
-            .offset(offset)
-            .load::<LogBook>(&mut conn)
-            .map_err(|e| e.to_string())
+            .offset(offset);
+
+        query.load::<LogBook>(&mut conn).map_err(|e| e.to_string())
     }
 
     pub fn count_log_books(&self) -> i64 {
